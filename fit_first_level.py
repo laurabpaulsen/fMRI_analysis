@@ -9,6 +9,7 @@ import pandas as pd
 from nilearn import masking
 import nibabel as nib
 from nilearn.glm.first_level import FirstLevelModel
+import pickle
 
 #for inline visualization in jupyter notebook
 %matplotlib inline 
@@ -81,11 +82,19 @@ def fit_first_level_subject(subject, bids_dir, runs = [1], space = "MNI152NLin20
 
 
 if __name__ in "__main__":
-    bids_dir = "/projects/MINDLAB2022_MR-semantics-of-depression/scratch/bachelor_scratch/BIDS"
+    path = Path(__file__).parent
 
+    output_path = path / "output"
 
-    flm = fit_firstlevel(subject, bids_dir, drift_model='cosine', high_pass=0.01) 
+    # make sure that output path exists
+    if not output_path.exists():
+        output_path.mkdir()
 
-    file_name = "insert here"
-    pickle.dump(flm, open(file_name, 'wb'))
-        
+    bids_dir = Path("/work/816119/InSpePosNegData/BIDS_2023E")
+    subjects = ["0116", "0117", "0118", "0119"]
+
+    for subject in subjects:
+        flm = fit_first_level_subject(subject, bids_dir, drift_model='cosine', high_pass=0.01) 
+        file_name = f"flm_{subject}.pkl"
+        pickle.dump(flm, open(file_name, 'wb'))
+            
