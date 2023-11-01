@@ -1,0 +1,14 @@
+imageio
+scipy
+numpy
+matplotlib==3.7.1
+dicom2nifti
+nibabel
+nilearn
+seaborn
+crtoolbox
+ipywidgets
+pandas
+pyvistaqt
+ndslib
+bids
