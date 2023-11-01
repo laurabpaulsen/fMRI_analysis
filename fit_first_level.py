@@ -1,5 +1,12 @@
+"""
+BEAWARE OF WARNING!
+
+/work/LauraBockPaulsen#1941/fMRI_analysis/env/lib/python3.10/site-packages/nilearn/glm/first_level/first_level.py:76: UserWarning: Mean values of 0 observed.The data have probably been centered.Scaling might not work as expected
+
+Try and solve <3
+"""
+
 import os
-import matplotlib.pyplot as plt
 from nilearn import image as nimg
 from nilearn import plotting as nplot
 from bids import BIDSLayout
@@ -11,11 +18,18 @@ import nibabel as nib
 from nilearn.glm.first_level import FirstLevelModel
 import pickle
 
-#for inline visualization in jupyter notebook
-%matplotlib inline 
+def update_trial_type(trial_type):
+    if trial_type in ['IMG_PO', 'IMG_PS']:
+        return "positive"
+    elif trial_type in ['IMG_NO', 'IMG_NS']:
+        return "negative"
+    elif trial_type == "IMG_BI":
+        return "IMG_button"
+    else:
+        return trial_type
 
 
-def fit_first_level_subject(subject, bids_dir, runs = [1], space = "MNI152NLin2009cAsym"):
+def fit_first_level_subject(subject, bids_dir, runs = [1, 2, 3, 4, 5, 6], space = "MNI152NLin2009cAsym"):
     """
 
     Parameters
@@ -55,10 +69,8 @@ def fit_first_level_subject(subject, bids_dir, runs = [1], space = "MNI152NLin20
         # get the data corresponding to the events and only keep the needed columns
         event_df = event_df.loc[:, ["onset", "duration", "trial_type"]]
 
-        # only keep trial types "IMG_POS" and "IMG_NEG"
-        event_df = event_df[event_df['trial_type'].isin(['IMG_PO', 'IMG_NO', 'IMG_PS', 'IMG_NS'])]
+        event_df["trial_type"] = event_df["trial_type"].apply(update_trial_type)
         events.append(event_df)
-
 
         # get the corresponding confounds
         confounds_path = str(f_prep_path).replace(f'_echo-1_space-{space}_desc-preproc_bold.nii.gz', '_desc-confounds_timeseries.tsv')
@@ -71,30 +83,30 @@ def fit_first_level_subject(subject, bids_dir, runs = [1], space = "MNI152NLin20
 
         masks.append(mask)
 
-
     # merge the masks
     mask_img = masking.intersect_masks(masks, threshold=0.8)
 
-    first_level_model = FirstLevelModel(t_r=nib.load(func).header['pixdim'][4], slice_time_ref=0.5, mask_img=mask_img)
-    first_level_model.fit(fprep_func_paths, events, confounds, verbose = 1)
+    first_level_model = FirstLevelModel(t_r=int(nib.load(f_prep_path).header['pixdim'][4]), verbose = 1)
+    first_level_model.fit(fprep_func_paths, events, confounds)
     
     return first_level_model
 
 
 if __name__ in "__main__":
     path = Path(__file__).parent
+    print(path)
 
-    output_path = path / "output"
+    output_path = path / "flms"
 
     # make sure that output path exists
     if not output_path.exists():
         output_path.mkdir()
 
     bids_dir = Path("/work/816119/InSpePosNegData/BIDS_2023E")
-    subjects = ["0116", "0117", "0118", "0119"]
+    subjects = ["0116", "0117", "0118", "0119", "0120", "0121", "0122", "0123"]
 
     for subject in subjects:
-        flm = fit_first_level_subject(subject, bids_dir, drift_model='cosine', high_pass=0.01) 
+        flm = fit_first_level_subject(subject, bids_dir) 
         file_name = f"flm_{subject}.pkl"
-        pickle.dump(flm, open(file_name, 'wb'))
+        pickle.dump(flm, open(output_path / file_name, 'wb'))
             
