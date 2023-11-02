@@ -18,6 +18,59 @@ import nibabel as nib
 from nilearn.glm.first_level import FirstLevelModel
 import pickle
 
+def add_button_presses(event_df, trial_type_col = "trial_type", response_col = "response_time"):
+    """
+    Takes an event dataframe and adds button presses to it by looking at the "IMG_BI" events and the corresponding "response_time".
+
+    Parameters
+    ----------
+    event_df : pd.DataFrame
+        Dataframe containing the events.
+    
+    trial_type_col : str
+        Name of the column containing the trial types.
+
+    response_col : str
+        Name of the column containing the response times.
+    
+    Returns
+    -------
+    event_df : pd.DataFrame
+        Dataframe containing the events with button presses added.
+    """
+
+    # get the indices of the button presses
+    button_img_indices = event_df.index[event_df[trial_type_col] == "IMG_BI"].tolist()
+
+    for index in button_img_indices:
+
+        # new row to add to the dataframe
+        new_row = event_df.loc[index, :].copy()
+
+        # get the response time
+        response_time = event_df.loc[index, response_col]
+
+        # change the trial type to button press
+        new_row[trial_type_col] = "IMG_button"
+
+        # change the onset to the response time plus the original onset
+        new_row["onset"] = response_time + new_row["onset"]
+
+        # change the duration to 0
+        new_row["duration"] = 0 # Not sure this makes sense?
+
+        # append the new row to the dataframe
+        event_df = event_df.append(new_row, ignore_index=True)
+
+    # sort the dataframe by onset
+    event_df = event_df.sort_values(by=["onset"])
+
+    return event_df
+
+
+
+
+
 def update_trial_type(trial_type):
     if trial_type in ['IMG_PO', 'IMG_PS']:
         return "positive"
@@ -65,6 +118,9 @@ def fit_first_level_subject(subject, bids_dir, runs = [1, 2, 3, 4, 5, 6], space 
         # get the corresponding events
         event_path = str(f_raw_path).replace(f'_echo-1_space-{space}_desc-preproc_bold.nii.gz', '_events.tsv')
         event_df = pd.read_csv(event_path, sep='\t')
+
+        # add button presses to the event dataframe
+        event_df = add_button_presses(event_df)
 
         # get the data corresponding to the events and only keep the needed columns
         event_df = event_df.loc[:, ["onset", "duration", "trial_type"]]
