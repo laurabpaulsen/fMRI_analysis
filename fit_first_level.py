@@ -62,7 +62,6 @@ def add_button_presses(event_df, trial_type_col = "trial_type", response_col = "
 
 
 
-
 def update_trial_type(trial_type):
     if trial_type in ['IMG_PO', 'IMG_PS']:
         return "positive"
@@ -134,7 +133,7 @@ def fit_first_level_subject(subject, bids_dir, runs = [1, 2, 3, 4, 5, 6], space 
     # merge the masks
     mask_img = masking.intersect_masks(masks, threshold=0.8)
 
-    first_level_model = FirstLevelModel(t_r=int(nib.load(f_prep_path).header['pixdim'][4]), verbose = 1)
+    first_level_model = FirstLevelModel(t_r=int(nib.load(f_prep_path).header['pixdim'][4]), mask_img = mask_img, verbose = 1)
     first_level_model.fit(fprep_func_paths, events, confounds)
     
     return first_level_model
