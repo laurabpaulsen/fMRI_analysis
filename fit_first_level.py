@@ -6,10 +6,6 @@ BEAWARE OF WARNING!
 Try and solve?? or ask mikkel if he already scaled?
 """
 
-import os
-from nilearn import image as nimg
-from nilearn import plotting as nplot
-from bids import BIDSLayout
 from pathlib import Path
 import numpy as np
 import pandas as pd
