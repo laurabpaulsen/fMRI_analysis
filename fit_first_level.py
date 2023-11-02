@@ -18,7 +18,7 @@ import nibabel as nib
 from nilearn.glm.first_level import FirstLevelModel
 import pickle
 
-def add_button_presses(event_df, trial_type_col = "trial_type", response_col = "response_time"):
+def add_button_presses(event_df, trial_type_col = "trial_type", response_col = "RT"):
     """
     Takes an event dataframe and adds button presses to it by looking at the "IMG_BI" events and the corresponding "response_time".
 
@@ -41,29 +41,35 @@ def add_button_presses(event_df, trial_type_col = "trial_type", response_col = "
 
     # get the indices of the button presses
     button_img_indices = event_df.index[event_df[trial_type_col] == "IMG_BI"].tolist()
+    #print(button_img_indices)
 
     for index in button_img_indices:
 
         # new row to add to the dataframe
         new_row = event_df.loc[index, :].copy()
+        #print(new_row["trial_type"] == "IMG_BI")
 
         # get the response time
-        response_time = event_df.loc[index, response_col]
+        response_time = new_row[response_col]
 
         # change the trial type to button press
-        new_row[trial_type_col] = "IMG_button"
+        new_row[trial_type_col] = "button_press"
 
         # change the onset to the response time plus the original onset
         new_row["onset"] = response_time + new_row["onset"]
-
+        
         # change the duration to 0
         new_row["duration"] = 0 # Not sure this makes sense?
 
+        #print(pd.DataFrame(new_row, columns = event_df.columns).columns)
         # append the new row to the dataframe
-        event_df = event_df.append(new_row, ignore_index=True)
+        event_df = pd.concat([event_df, pd.DataFrame(new_row, columns = event_df.columns)], ignore_index=True)
+
+        print(event_df.tail(5))
 
     # sort the dataframe by onset
     event_df = event_df.sort_values(by=["onset"])
+    #print(event_df.head(10), "\n\n")
 
     return event_df
 
