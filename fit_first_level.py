@@ -41,7 +41,6 @@ def add_button_presses(event_df, trial_type_col = "trial_type", response_col = "
 
     # get the indices of the button presses
     button_img_indices = event_df.index[event_df[trial_type_col] == "IMG_BI"].tolist()
-    #print(button_img_indices)
 
     for index in button_img_indices:
 
@@ -52,17 +51,14 @@ def add_button_presses(event_df, trial_type_col = "trial_type", response_col = "
         onset = response_time + event_df.loc[index, "onset"]
         
         # new row to add to the dataframe
-        new_row = pd.DataFrame({"onset": onset, "duration": 0, "trial_type": "button_press"})
+        # NOTE: NOT SURE WHAT THE APPROPRIATE DURATION IS HERE?
+        new_row = pd.DataFrame({"onset": [onset], "duration": [0.5], "trial_type": ["button_press"]})
 
         # concatenate the new row to the dataframe
         event_df = pd.concat([event_df, new_row], ignore_index=True)
 
-
-        print(event_df.tail(5))
-
     # sort the dataframe by onset
     event_df = event_df.sort_values(by=["onset"])
-    #print(event_df.head(10), "\n\n")
 
     return event_df
 
