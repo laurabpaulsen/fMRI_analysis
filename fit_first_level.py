@@ -3,7 +3,7 @@ BEAWARE OF WARNING!
 
 /work/LauraBockPaulsen#1941/fMRI_analysis/env/lib/python3.10/site-packages/nilearn/glm/first_level/first_level.py:76: UserWarning: Mean values of 0 observed.The data have probably been centered.Scaling might not work as expected
 
-Try and solve <3
+Try and solve?? or ask mikkel if he already scaled?
 """
 
 import os
@@ -50,12 +50,13 @@ def add_button_presses(event_df, trial_type_col = "trial_type", response_col = "
         # get the onset
         onset = response_time + event_df.loc[index, "onset"]
         
-        # new row to add to the dataframe
-        # NOTE: NOT SURE WHAT THE APPROPRIATE DURATION IS HERE?
-        new_row = pd.DataFrame({"onset": [onset], "duration": [0.5], "trial_type": ["button_press"]})
+        if np.isnan(onset) == False: # not including missed button presses where RT is NaN
+            # new row to add to the dataframe
+            # NOTE: NOT SURE WHAT THE APPROPRIATE DURATION IS HERE?
+            new_row = pd.DataFrame({"onset": [onset], "duration": [0.5], "trial_type": ["button_press"]})
 
-        # concatenate the new row to the dataframe
-        event_df = pd.concat([event_df, new_row], ignore_index=True)
+            # concatenate the new row to the dataframe
+            event_df = pd.concat([event_df, new_row], ignore_index=True)
 
     # sort the dataframe by onset
     event_df = event_df.sort_values(by=["onset"])
