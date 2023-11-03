@@ -14,6 +14,34 @@ import nibabel as nib
 from nilearn.glm.first_level import FirstLevelModel
 import pickle
 
+def load_prep_events(path): 
+    """
+
+    """
+    event_df = pd.read_csv(path, sep='\t')
+
+    # add button presses to the event dataframe
+    event_df = add_button_presses(event_df)
+
+    # get the data corresponding to the events and only keep the needed columns
+    event_df = event_df.loc[:, ["onset", "duration", "trial_type"]]
+
+    event_df["trial_type"] = event_df["trial_type"].apply(update_trial_type)
+
+    return event_df
+
+def load_prep_confounds(path, confound_cols = ['trans_x', 'trans_y', 'trans_z', 'rot_x', 'rot_y', 'rot_z']):
+    """ 
+
+    """
+    # load the confounds
+    confounds_df = pd.read_csv(path, sep='\t')
+
+    # choose specific columns
+    confounds_df = confounds_df. loc[:, confound_cols]
+
+    return confounds_df
+
 def add_button_presses(event_df, trial_type_col = "trial_type", response_col = "RT"):
     """
     Takes an event dataframe and adds button presses to it by looking at the "IMG_BI" events and the corresponding "response_time".
@@ -102,38 +130,25 @@ def fit_first_level_subject(subject, bids_dir, runs = [1, 2, 3, 4, 5, 6], space 
     
     # paths to raw functional data for all runs
     raw_func_paths = [bids_func_dir / f"sub-{subject}_task-boldinnerspeech_run-{run}_echo-1_space-{space}_desc-preproc_bold.nii.gz" for run in runs]
+
+    # prepare event files
+    event_paths = [bids_func_dir / f"sub-{subject}_task-boldinnerspeech_run-{run}_events.tsv" for run in runs]
+    events = [load_prep_events(path) for path in event_paths]
+
+    # paths to confounds
+    confounds_paths = [fprep_func_dir / f"sub-{subject}_task-boldinnerspeech_run-{run}_desc-confounds_timeseries.tsv" for run in runs]
+    confounds = [load_prep_confounds(path) for path in confounds_paths]
     
-    events, confounds, masks = [], [], [] 
-    
-    for f_prep_path, f_raw_path in zip(fprep_func_paths, raw_func_paths):
-        # get the corresponding events
-        event_path = str(f_raw_path).replace(f'_echo-1_space-{space}_desc-preproc_bold.nii.gz', '_events.tsv')
-        event_df = pd.read_csv(event_path, sep='\t')
-
-        # add button presses to the event dataframe
-        event_df = add_button_presses(event_df)
-
-        # get the data corresponding to the events and only keep the needed columns
-        event_df = event_df.loc[:, ["onset", "duration", "trial_type"]]
-
-        event_df["trial_type"] = event_df["trial_type"].apply(update_trial_type)
-        events.append(event_df)
-
-        # get the corresponding confounds
-        confounds_path = str(f_prep_path).replace(f'_echo-1_space-{space}_desc-preproc_bold.nii.gz', '_desc-confounds_timeseries.tsv')
-        confounds_df = pd.read_csv(confounds_path, sep='\t').loc[:, ['trans_x', 'trans_y', 'trans_z', 'rot_x', 'rot_y', 'rot_z']]
-        confounds.append(confounds_df)
-
-        # get the corresponding masks
-        mask_path = str(f_prep_path).replace(f'_echo-1_space-{space}_desc-preproc_bold.nii.gz', f'_space-{space}_desc-brain_mask.nii.gz')
-        mask = nib.load(mask_path)
-
-        masks.append(mask)
+    # prep masks
+    mask_paths = [fprep_func_dir / f"sub-{subject}_task-boldinnerspeech_run-{run}_space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz" for run in runs]
+    masks = [nib.load(path) for path in mask_paths]
 
     # merge the masks
     mask_img = masking.intersect_masks(masks, threshold=0.8)
 
-    first_level_model = FirstLevelModel(t_r=int(nib.load(f_prep_path).header['pixdim'][4]), mask_img = mask_img, verbose = 1)
+
+    # fit first level model
+    first_level_model = FirstLevelModel(t_r=int(nib.load(fprep_func_paths[0]).header['pixdim'][4]), mask_img = mask_img, verbose = 1)
     first_level_model.fit(fprep_func_paths, events, confounds)
     
     return first_level_model
@@ -141,7 +156,6 @@ def fit_first_level_subject(subject, bids_dir, runs = [1, 2, 3, 4, 5, 6], space 
 
 if __name__ in "__main__":
     path = Path(__file__).parent
-    print(path)
 
     output_path = path / "flms"
 
