@@ -1,9 +1,8 @@
 """
-BEAWARE OF WARNING!
+This script loops over all the participants and fits a first level model to their data
 
-/work/LauraBockPaulsen#1941/fMRI_analysis/env/lib/python3.10/site-packages/nilearn/glm/first_level/first_level.py:76: UserWarning: Mean values of 0 observed.The data have probably been centered.Scaling might not work as expected
-
-Try and solve?? or ask mikkel if he already scaled?
+Author: Laura Bock Paulsen
+Modified from code by Emma Olsen and Sirid Wihlborg (https://github.com/emmarisgaardolsen/BSc_project_fMRI/blob/main/fmri_analysis_scripts/first_level_fit_function.py)
 """
 
 from pathlib import Path
@@ -16,8 +15,19 @@ import pickle
 
 def load_prep_events(path): 
     """
+    Loads the event tsv and modifies it to contain the events we want
 
+    Parameters
+    ----------
+    path : Path
+        Path to tsv file containing the events
+    
+    Returns
+    -------
+    event_df : pd.DataFrame
+        Pandas dataframe containing the events
     """
+    # load the data
     event_df = pd.read_csv(path, sep='\t')
 
     # add button presses to the event dataframe
@@ -31,8 +41,20 @@ def load_prep_events(path):
     return event_df
 
 def load_prep_confounds(path, confound_cols = ['trans_x', 'trans_y', 'trans_z', 'rot_x', 'rot_y', 'rot_z']):
-    """ 
+    """
+    Loads the confound tsv and modifies it to contain the events we want
 
+    Parameters
+    ----------
+    path : Path
+        Path to tsv file containing the events
+    confound_cols : list of strings
+        List of the column names that should be included in the confounds_df
+    
+    Returns
+    -------
+    confounds_df : pd.DataFrame
+        Pandas dataframe containing the confounds
     """
     # load the confounds
     confounds_df = pd.read_csv(path, sep='\t')
@@ -118,6 +140,10 @@ def fit_first_level_subject(subject, bids_dir, runs = [1, 2, 3, 4, 5, 6], space 
     space : str
         Name of the space of the data to load.
     
+    Returns
+    -------
+    first_level_model : FirstLevelModel
+        First level model fitted for one subject
 
     """
     
@@ -156,7 +182,6 @@ def fit_first_level_subject(subject, bids_dir, runs = [1, 2, 3, 4, 5, 6], space 
 
 if __name__ in "__main__":
     path = Path(__file__).parent
-
     output_path = path / "flms"
 
     # make sure that output path exists
