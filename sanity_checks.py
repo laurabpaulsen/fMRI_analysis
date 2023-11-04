@@ -63,8 +63,13 @@ def plot_all_subjects(flms, subject_ids, save_path = None, contrast = "button_pr
 
 
 if __name__ in "__main__":
+    path = Path(__file__).parent
     flm_path = Path("/work/LauraBockPaulsen#1941/fMRI_analysis/flms")
     flms, subject_ids = load_first_level_models(flm_path, return_subject_ids = True)
+    output_path = path / "fig" / "sanity_checks"
+
+    if not output_path.exists():
+        output_path.mkdir(parents = True)
 
     # plot button press contrast for all subjects
-    plot_all_subjects(flms, subject_ids, save_path = "plots/button_press_contrast.png", contrast = "button_press", output_type = "z_score")
+    plot_all_subjects(flms, subject_ids, save_path = output_path / "button_press_contrast.png", contrast = "button_press", output_type = "z_score")
