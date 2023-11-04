@@ -16,6 +16,7 @@ def load_first_level_models(path: Path, return_subject_ids = False):
         List of first level models.
     """
     flm_files = [f for f in path.iterdir() if f.is_file() and f.suffix == ".pkl"]
+    flm_files.sort()
 
     flms = []
 
@@ -24,7 +25,7 @@ def load_first_level_models(path: Path, return_subject_ids = False):
         flms.append(flm_model)
     
     if return_subject_ids:
-        subject_ids = [flm.subject_label for flm in flms]
+        subject_ids = [path.stem[-4:] for path in flm_files]
         return flms, subject_ids
     else:
         return flms
