@@ -2,9 +2,11 @@
 This file holds the code for generating plots used for sanity checks.
 """
 from pathlib import Path
+
+# local imports
+import sys
+sys.path.append(str(Path(__file__).parents[1]))
 from utils import load_first_level_models, plot_contrast_all_subjects
-
-
 
 if __name__ in "__main__":
     path = Path(__file__).parents[1]
