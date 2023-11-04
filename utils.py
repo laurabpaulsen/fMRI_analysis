@@ -43,7 +43,7 @@ def sanitise_contrast(contrast:str):
     Sanitises the contrast name for plotting
     """
     contrast = contrast.replace("_", " ")
-    contrast = contrast.capitalize()
+    contrast = contrast.title()
 
     return contrast
 
