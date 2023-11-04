@@ -54,16 +54,15 @@ def plot_all_subjects(flms, subject_ids, save_path = None, contrast = "button_pr
     Returns
     -------
     """
-    fig, axes = plt.subplots(int(len(flms)/2), 2, figsize=(10, 15))
+    fig, axes = plt.subplots(int(len(flms)/2), 2, figsize=(10, 12))
     
     for i, (flm, subject_id) in enumerate(zip(flms, subject_ids)):
         ax = axes.flatten()[i]
         plot_contrast_subject_level(flm, subject_id, ax = ax, contrast = contrast, output_type = output_type)
 
-        # remove the title from the plot
 
     fig.suptitle(f"Contrast: {contrast}")
-    fig.tight_layout()
+
     if save_path:
         plt.savefig(save_path, dpi=300)
 
