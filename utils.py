@@ -116,7 +116,7 @@ def plot_contrast_all_subjects(flms, subject_ids, threshold = False, save_path =
         plot_contrast_subject_level(flm, subject_id, ax, threshold, contrast = contrast, output_type = output_type)
 
     # add super title in bold
-    fig.suptitle(f"Contrast {sanitise_contrast(contrast)}, {output_type}", fontweight="bold", fontsize=20)
+    fig.suptitle(f"{sanitise_contrast(contrast)}", fontweight="bold", fontsize=20)
 
     if save_path:
         plt.savefig(save_path, dpi=300)
