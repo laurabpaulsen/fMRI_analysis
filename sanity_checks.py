@@ -53,7 +53,7 @@ def plot_all_subjects(flms, subject_ids, save_path = None, contrast = "button_pr
     Returns
     -------
     """
-    fig, axes = plt.subplots(2, int(len(flms)/2), figsize=(15, 5))
+    fig, axes = plt.subplots(int(len(flms)/2), 2, figsize=(10, 15))
     
     for i, (flm, subject_id) in enumerate(zip(flms, subject_ids)):
         plot_contrast_subject_level(flm, subject_id, ax = axes.flatten()[i], contrast = contrast, output_type = output_type)
