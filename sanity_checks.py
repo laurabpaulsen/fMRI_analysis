@@ -73,8 +73,8 @@ def plot_all_subjects(flms, subject_ids, threshold = False, save_path = None, co
         ax = axes.flatten()[i]
         plot_contrast_subject_level(flm, subject_id, ax, threshold, contrast = contrast, output_type = output_type)
 
-
-    fig.suptitle(f"Contrast: {contrast}")
+    # add super title in bold
+    fig.suptitle(f"Contrast {contrast}, {output_type}", fontweight="bold", fontsize=20)
 
     if save_path:
         plt.savefig(save_path, dpi=300)
