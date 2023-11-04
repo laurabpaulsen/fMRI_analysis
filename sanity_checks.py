@@ -30,10 +30,11 @@ def plot_contrast_subject_level(flm, subject_id, ax = None, contrast = "button_p
     plotting.plot_glass_brain(
         contrast_map, 
         colorbar=True,
-        title=f"Button press ({output_type}), Subject {subject_id}",
         plot_abs=False, 
         cmap='RdBu',
         axes=ax)
+    
+    ax.set_title(f"Subject {subject_id}")
 
 def plot_all_subjects(flms, subject_ids, save_path = None, contrast = "button_press", output_type = "z_score"):
     """
@@ -56,8 +57,13 @@ def plot_all_subjects(flms, subject_ids, save_path = None, contrast = "button_pr
     fig, axes = plt.subplots(2, int(len(flms)/2), figsize=(15, 5))
     
     for i, (flm, subject_id) in enumerate(zip(flms, subject_ids)):
-        plot_contrast_subject_level(flm, subject_id, ax = axes.flatten()[i], contrast = contrast, output_type = output_type)
+        ax = axes.flatten()[i]
+        plot_contrast_subject_level(flm, subject_id, ax = ax, contrast = contrast, output_type = output_type)
 
+        # remove the title from the plot
+
+    fig.suptitle(f"Contrast: {contrast}")
+    fig.tight_layout()
     if save_path:
         plt.savefig(save_path, dpi=300)
 
