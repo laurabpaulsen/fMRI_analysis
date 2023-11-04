@@ -181,7 +181,7 @@ def fit_first_level_subject(subject, bids_dir, runs = [1, 2, 3, 4, 5, 6], space 
 
 
 if __name__ in "__main__":
-    path = Path(__file__).parent
+    path = Path(__file__).parents[1]
     output_path = path / "flms"
 
     # make sure that output path exists
