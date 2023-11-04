@@ -28,7 +28,7 @@ python src/sanity_checks.py
 
 Calculate and plot the contrast between positive and negative inner speech
 ```
-python src/contrast_inner_speech.py # NOT IMPLEMENTED YET
+python src/contrast_inner_speech.py
 ```
 
 Run decoding analysis
