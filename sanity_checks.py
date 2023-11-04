@@ -92,7 +92,8 @@ if __name__ in "__main__":
     # plot button press contrast for all subjects
     plot_all_subjects(
         flms, subject_ids, 
-        threshold=True save_path = output_path / "button_press_contrast.png", 
+        threshold=True,
+        save_path = output_path / "button_press_contrast.png", 
         contrast = "button_press", 
         output_type = "z_score"
         )
