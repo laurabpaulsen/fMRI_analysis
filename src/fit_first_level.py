@@ -38,6 +38,8 @@ def load_prep_events(path):
 
     event_df["trial_type"] = event_df["trial_type"].apply(update_trial_type)
 
+    event_df = event_df.reset_index(drop = True)
+
     return event_df
 
 def load_prep_confounds(path, confound_cols = ['trans_x', 'trans_y', 'trans_z', 'rot_x', 'rot_y', 'rot_z']):
@@ -110,8 +112,6 @@ def add_button_presses(event_df, trial_type_col = "trial_type", response_col = "
     return event_df
 
 
-
-
 def update_trial_type(trial_type):
     if trial_type in ['IMG_PO', 'IMG_PS']:
         return "positive"
@@ -172,9 +172,15 @@ def fit_first_level_subject(subject, bids_dir, runs = [1, 2, 3, 4, 5, 6], space 
     # merge the masks
     mask_img = masking.intersect_masks(masks, threshold=0.8)
 
-
     # fit first level model
-    first_level_model = FirstLevelModel(t_r=int(nib.load(fprep_func_paths[0]).header['pixdim'][4]), mask_img = mask_img, verbose = 1)
+    first_level_model = FirstLevelModel(
+        t_r=int(nib.load(fprep_func_paths[0]).header['pixdim'][4]), 
+        mask_img = mask_img, 
+        slice_time_ref = 0.5,
+        hrf_model = "glover",
+        verbose = 1
+        )
+
     first_level_model.fit(fprep_func_paths, events, confounds)
     
     return first_level_model
@@ -190,7 +196,7 @@ if __name__ in "__main__":
 
     bids_dir = Path("/work/816119/InSpePosNegData/BIDS_2023E")
     subjects = ["0116", "0117", "0118", "0119", "0120", "0121", "0122", "0123"]
-
+    
     for subject in subjects:
         flm = fit_first_level_subject(subject, bids_dir) 
         file_name = f"flm_{subject}.pkl"
