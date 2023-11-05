@@ -34,15 +34,15 @@ if __name__ in "__main__":
             height_control='bonferroni'
             ) 
 
-        fig, ax = plt.subplots(1,1, figsize = (10, 12), dpi = 300)
+        fig, ax = plt.subplots(1, 1, figsize = (12, 6), dpi = 300)
 
         plotting.plot_glass_brain(
             thresholded_map, 
             colorbar=True,
             plot_abs=False, 
-            ax = ax, 
+            axes = ax, 
             cmap='RdBu')
 
         ax.set_title(f"{sanitise_contrast(contrast)} (Bonferroni, alpha < 0.05)")
 
-        plt.savefig(path / fig / f"{contrast}_across_subjects.png")
+        plt.savefig(path / "fig" / f"{contrast}_across_subjects.png")
