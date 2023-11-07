@@ -137,7 +137,7 @@ if __name__ in "__main__":
         
         flms = fit_first_level_subject_per_trial(subject, bids_dir)
 
-        for flm in flms:
+        for i, flm in enumerate(flms):
             # get the names of the regressors
             regressor_names = flm.design_matrices_[0].columns
 
@@ -149,7 +149,7 @@ if __name__ in "__main__":
                 contrast = flm.compute_contrast(reg, output_type = "z_score")
 
                 # save to pickle
-                file_name = f"contrast_{reg}.pkl"
+                file_name = f"contrast_{reg}_run_{i}.pkl"
 
                 pickle.dump(contrast, open(outpath_subject / file_name, 'wb'))
             
