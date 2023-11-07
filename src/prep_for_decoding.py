@@ -60,7 +60,6 @@ def fit_first_level_subject_per_trial(subject, bids_dir, runs = [1, 2, 3, 4, 5, 
     
     bids_func_dir  = bids_dir / f"sub-{subject}" / "func"
     fprep_func_dir  = bids_dir / "derivatives" / f"sub-{subject}" / "func"
-    
 
     # paths to functional preprocessed data for all runs
     fprep_func_paths = [fprep_func_dir / f"sub-{subject}_task-boldinnerspeech_run-{run}_echo-1_space-{space}_desc-preproc_bold.nii.gz" for run in runs]
@@ -86,6 +85,7 @@ def fit_first_level_subject_per_trial(subject, bids_dir, runs = [1, 2, 3, 4, 5, 
     flms = []
 
     for i in range(len(runs)):
+        print(f"Fitting model for run {i} for subject {subject}")
             
         # fit first level model
         first_level_model = FirstLevelModel(
@@ -93,7 +93,6 @@ def fit_first_level_subject_per_trial(subject, bids_dir, runs = [1, 2, 3, 4, 5, 
             mask_img = masks[0], 
             slice_time_ref = 0.5,
             hrf_model = "glover",
-            verbose = 1
             )
         
         # fit the model
@@ -102,7 +101,7 @@ def fit_first_level_subject_per_trial(subject, bids_dir, runs = [1, 2, 3, 4, 5, 
         flms.append(flms)
 
     
-    return first_level_model
+    return flms
 
 def get_contrast(regressor, flm, output_type = "z_score"):
     """
