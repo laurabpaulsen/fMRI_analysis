@@ -104,10 +104,6 @@ if __name__ in "__main__":
 
     outpath = path / "data" / "decoding" 
 
-    # ensure outpath exists 
-    if not outpath.exists():
-        outpath.mkdir()
-
     bids_dir = Path("/work/816119/InSpePosNegData/BIDS_2023E")
     subjects = ["0116", "0117", "0118", "0119", "0120", "0121", "0122", "0123"]
     
