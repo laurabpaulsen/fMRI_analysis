@@ -81,21 +81,38 @@ def fit_first_level_subject_per_trial(subject, bids_dir, runs = [1, 2, 3, 4, 5, 
     mask_paths = [fprep_func_dir / f"sub-{subject}_task-boldinnerspeech_run-{run}_space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz" for run in runs]
     masks = [nib.load(path) for path in mask_paths]
 
-    # merge the masks
-    mask_img = masking.intersect_masks(masks, threshold=0.8)
 
-    # fit first level model
-    first_level_model = FirstLevelModel(
-        t_r=int(nib.load(fprep_func_paths[0]).header['pixdim'][4]), 
-        mask_img = mask_img, 
-        slice_time_ref = 0.5,
-        hrf_model = "glover",
-        verbose = 1
-        )
+    # fit first level model for each run
+    flms = []
 
-    first_level_model.fit(fprep_func_paths, events, confounds)
+    for i in range(len(runs)):
+            
+        # fit first level model
+        first_level_model = FirstLevelModel(
+            t_r=int(nib.load(fprep_func_paths[0]).header['pixdim'][4]), 
+            mask_img = masks[0], 
+            slice_time_ref = 0.5,
+            hrf_model = "glover",
+            verbose = 1
+            )
+        
+        # fit the model
+        flm = first_level_model.fit(fprep_func_paths[i], events[i], confounds[i])
+        
+        flms.append(flms)
+
     
     return first_level_model
+
+def get_contrast(regressor, flm, output_type = "z_score"):
+    """
+    Calculates the contrast of a given trial type
+    """
+    contrast_map  = flm.compute_contrast(regressor, output_type = output_type)
+
+    return contrast_map
+
+
 
 
 
@@ -118,8 +135,22 @@ if __name__ in "__main__":
         if not outpath_subject.exists():
             outpath.mkdir(parents=True)
         
-        flm = fit_first_level_subject_per_trial(subject, bids_dir)
+        flms = fit_first_level_subject_per_trial(subject, bids_dir)
 
-        #pickle.dump(flm, open(output_path / / file_name, 'wb'))
+        for flm in flms:
+            # get the names of the regressors
+            regressor_names = flm.design_matrices_[0].columns
+
+            # only keep the ones with positive or negative
+            regressor_names = [name for name in regressor_names if "positive" in name or "negative" in name]
+
+            # get the contrasts
+            for reg in regressor_names:
+                contrast = flm.compute_contrast(reg, output_type = "z_score")
+
+                # save to pickle
+                file_name = f"contrast_{reg}.pkl"
+
+                pickle.dump(contrast, open(outpath_subject / file_name, 'wb'))
             
     
