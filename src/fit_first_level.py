@@ -154,9 +154,6 @@ def fit_first_level_subject(subject, bids_dir, runs = [1, 2, 3, 4, 5, 6], space 
     # paths to functional preprocessed data for all runs
     fprep_func_paths = [fprep_func_dir / f"sub-{subject}_task-boldinnerspeech_run-{run}_echo-1_space-{space}_desc-preproc_bold.nii.gz" for run in runs]
     
-    # paths to raw functional data for all runs
-    raw_func_paths = [bids_func_dir / f"sub-{subject}_task-boldinnerspeech_run-{run}_echo-1_space-{space}_desc-preproc_bold.nii.gz" for run in runs]
-
     # prepare event files
     event_paths = [bids_func_dir / f"sub-{subject}_task-boldinnerspeech_run-{run}_events.tsv" for run in runs]
     events = [load_prep_events(path) for path in event_paths]
