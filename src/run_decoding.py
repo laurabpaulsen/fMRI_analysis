@@ -5,6 +5,8 @@ import pickle
 from pathlib import Path
 import numpy as np
 import nibabel as nib
+from nilearn.decoding import SearchLight
+from sklearn.svm import LinearSVC
 
 
 def load_contrasts_dir(path:Path):
@@ -47,8 +49,6 @@ def prep_X_y(pos_contrasts:list, neg_contrasts:list):
 
 
 
-
-
 if __name__ in "__main__":
     path = Path(__file__).parents[1]
 
@@ -75,7 +75,23 @@ if __name__ in "__main__":
         # prep contrasts for decoding
         X, y = prep_X_y(contrasts_pos, contrasts_neg)
 
-        print(f"Number of positive contrasts: {len(contrasts_pos)}")
-        print(f"Number of negative contrasts: {len(contrasts_neg)}")
+        # brain mask 
+        mask_wb_filename = Path('/work/82777/BIDS/derivatives/sub-0096/anat/sub-{subject}_acq-T1sequence_run-1_space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz')
+        mask_wb = nib.load(mask_wb_filename).get_fdata()
 
-        print(f"Shape of X: {X.shape}")
+        searchlight = SearchLight(
+            mask_wb,
+            estimator=LinearSVC(penalty='l2'),
+            radius=5, 
+            n_jobs=-1,
+            verbose=10, 
+            cv=10
+            )
+        
+        searchlight.fit(X, y)
+
+        # save results
+        with open(results_path / f"sub-{subject}.pkl", "wb") as f:
+            pickle.dump(searchlight, f)
+
+
