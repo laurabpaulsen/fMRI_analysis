@@ -5,6 +5,7 @@ import pickle
 from pathlib import Path
 import numpy as np
 import nibabel as nib
+from nilearn.image import new_img_like, load_img
 from nilearn.decoding import SearchLight
 from sklearn.svm import LinearSVC
 
@@ -69,16 +70,21 @@ if __name__ in "__main__":
         print(f"Running decoding analysis for subject {subject}...")
 
         # load in all contrasts
-        print(contrasts_path / f"sub-{subject}")
         contrasts_pos, contrasts_neg = load_contrasts_dir(contrasts_path / f"sub-{subject}")
 
         # prep contrasts for decoding
         X, y = prep_X_y(contrasts_pos, contrasts_neg)
 
         # brain mask 
-        mask_wb_filename = Path('/work/82777/BIDS/derivatives/sub-0096/anat/sub-{subject}_acq-T1sequence_run-1_space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz')
-        mask_wb = nib.load(mask_wb_filename).get_fdata()
+        
+        mask_wb_filename = Path(f"/work/816119/InSpePosNegData/BIDS_2023E/derivatives/sub-{subject}/anat/sub-{subject}_acq-T1sequence_run-1_space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz")
+        mask_wb = load_img(mask_wb_filename).get_fdata()
+        #mask_wb = new_img_like(mask_wb, np.int16(mask_wb))
+        print(X.shape)
+        print(mask_wb.shape)
 
+
+    
         searchlight = SearchLight(
             mask_wb,
             estimator=LinearSVC(penalty='l2'),
@@ -88,6 +94,7 @@ if __name__ in "__main__":
             cv=10
             )
         
+
         searchlight.fit(X, y)
 
         # save results
