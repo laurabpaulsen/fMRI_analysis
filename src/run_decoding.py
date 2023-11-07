@@ -76,12 +76,11 @@ if __name__ in "__main__":
         X, y = prep_X_y(contrasts_pos, contrasts_neg)
 
         # brain mask 
-        
         mask_wb_filename = Path(f"/work/816119/InSpePosNegData/BIDS_2023E/derivatives/sub-{subject}/anat/sub-{subject}_acq-T1sequence_run-1_space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz")
-        mask_wb = load_img(mask_wb_filename).get_fdata()
-        #mask_wb = new_img_like(mask_wb, np.int16(mask_wb))
-        print(X.shape)
-        print(mask_wb.shape)
+        mask_wb = load_img(mask_wb_filename)
+
+        # prep mask for decoding
+        mask_wb = new_img_like(mask_wb, np.ones(mask_wb.shape))
 
 
     
