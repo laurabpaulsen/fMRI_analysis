@@ -4,6 +4,7 @@ This script loads in the contrasts made in "prep_for_decoding.py" and runs a dec
 import pickle
 from pathlib import Path
 import numpy as np
+import nibabel as nib
 
 
 def load_contrasts_dir(path:Path):
@@ -18,6 +19,8 @@ def load_contrasts_dir(path:Path):
         # load in contrast
         with open(f, "rb") as f:
             contrast = pickle.load(f)
+        
+        contrast = contrast.get_fdata()
 
         # append to list
         if "positive" in f.name:
@@ -35,6 +38,7 @@ def prep_X_y(pos_contrasts:list, neg_contrasts:list):
     # concatenate all contrasts
     y = [1] * len(pos_contrasts) + [0] * len(neg_contrasts)
 
+
     # concatenate all contrasts and turn into numpy array
     X = pos_contrasts + neg_contrasts
     X = np.array(X)
@@ -49,9 +53,9 @@ if __name__ in "__main__":
     path = Path(__file__).parents[1]
 
     # path to contrasts
-    contrasts_path = path / "data" / "decoding" / "contrasts"
+    contrasts_path = path / "data" / "decoding" 
 
-    subjects = [f.name for f in contrasts_path.glob("*") if f.is_dir()]
+    subjects = ["0116"]#, "0117", "0118", "0119", "0120", "0121", "0122", "0123"]
 
     # path to save results
     results_path = path / "results"
@@ -65,7 +69,8 @@ if __name__ in "__main__":
         print(f"Running decoding analysis for subject {subject}...")
 
         # load in all contrasts
-        contrasts_pos, contrasts_neg = load_contrasts_dir(contrasts_path / subject)
+        print(contrasts_path / f"sub-{subject}")
+        contrasts_pos, contrasts_neg = load_contrasts_dir(contrasts_path / f"sub-{subject}")
 
         # prep contrasts for decoding
         X, y = prep_X_y(contrasts_pos, contrasts_neg)
