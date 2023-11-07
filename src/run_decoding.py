@@ -5,10 +5,11 @@ import pickle
 from pathlib import Path
 import numpy as np
 import nibabel as nib
-from nilearn.image import get_data, load_img, new_img_like
+from nilearn.image import get_data, load_img, new_img_like, concat_imgs
 from nilearn.decoding import SearchLight
 from sklearn.svm import LinearSVC
 from sklearn.model_selection import KFold
+
 
 def load_contrasts_dir(path:Path):
     """
@@ -44,7 +45,9 @@ def prep_X_y(pos_contrasts:list, neg_contrasts:list):
 
     # concatenate all contrasts and turn into numpy array
     X = pos_contrasts + neg_contrasts
-    X = np.array(X)
+
+    # concatenate images
+    X = concat_imgs(X)
 
     return X, y
 
