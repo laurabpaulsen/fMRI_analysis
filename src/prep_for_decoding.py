@@ -70,7 +70,6 @@ def fit_first_level_subject_per_trial(subject, bids_dir, runs = [1, 2, 3, 4, 5, 
 
     # rename the events
     events = [modify_events(event) for event in events]
-    print(events[0].head(10))
 
     # paths to confounds
     confounds_paths = [fprep_func_dir / f"sub-{subject}_task-boldinnerspeech_run-{run}_desc-confounds_timeseries.tsv" for run in runs]
@@ -98,7 +97,7 @@ def fit_first_level_subject_per_trial(subject, bids_dir, runs = [1, 2, 3, 4, 5, 
         # fit the model
         flm = first_level_model.fit(fprep_func_paths[i], events[i], confounds[i])
         
-        flms.append(flms)
+        flms.append(flm)
 
     
     return flms
@@ -110,9 +109,6 @@ def get_contrast(regressor, flm, output_type = "z_score"):
     contrast_map  = flm.compute_contrast(regressor, output_type = output_type)
 
     return contrast_map
-
-
-
 
 
 if __name__ in "__main__":
@@ -128,7 +124,7 @@ if __name__ in "__main__":
         
         # ensure outpath exists 
         if not outpath_subject.exists():
-            outpath.mkdir(exist_ok = True)
+            outpath_subject.mkdir(exist_ok = True)
         
         flms = fit_first_level_subject_per_trial(subject, bids_dir)
 
@@ -141,6 +137,7 @@ if __name__ in "__main__":
 
             # get the contrasts
             for reg in regressor_names:
+
                 contrast = flm.compute_contrast(reg, output_type = "z_score")
 
                 # save to pickle
