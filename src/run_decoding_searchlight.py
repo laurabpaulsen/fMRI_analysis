@@ -56,10 +56,10 @@ if __name__ in "__main__":
     # path to contrasts
     contrasts_path = path / "data" / "decoding" 
 
-    subjects = ["0116"]#, "0117", "0118", "0119", "0120", "0121", "0122", "0123"]
+    subjects = ["0116", "0117", "0118", "0119", "0120", "0121", "0122", "0123"]
 
     # path to save results
-    results_path = path / "results"
+    results_path = path / "data" / "searchlight"
 
     # ensure results path exists
     if not results_path.exists():
