@@ -65,7 +65,7 @@ def fit_first_level_subject_per_trial(subject, bids_dir, runs = [1, 2, 3, 4, 5, 
     fprep_func_paths = [fprep_func_dir / f"sub-{subject}_task-boldinnerspeech_run-{run}_echo-1_space-{space}_desc-preproc_bold.nii.gz" for run in runs]
 
     # prepare event files
-    event_paths = [bids_func_dir / f"sub-{subject}_task-boldinnerspeech_run-{run}_events.tsv" for run in runs]
+    event_paths = [bids_func_dir / f"sub-{subject}_task-boldinnerspeech_run-{run}_echo-1_events.tsv" for run in runs]
     events = [load_prep_events(path) for path in event_paths]
 
     # rename the events
@@ -139,7 +139,6 @@ if __name__ in "__main__":
             for reg in regressor_names:
 
                 contrast = flm.compute_contrast(reg, output_type = "z_score")
-
                 # shape of contrast
                 print(f"Shape of contrast: {contrast.shape}")
                 # save to pickle
