@@ -124,7 +124,7 @@ if __name__ in "__main__":
         
         # ensure outpath exists 
         if not outpath_subject.exists():
-            outpath_subject.mkdir(exist_ok = True)
+            outpath_subject.mkdir(exist_ok = True, parents = True)
         
         flms = fit_first_level_subject_per_trial(subject, bids_dir)
 

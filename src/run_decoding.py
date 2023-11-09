@@ -66,7 +66,7 @@ if __name__ in "__main__":
 
     # ensure results path exists
     if not results_path.exists():
-        results_path.mkdir()
+        results_path.mkdir(exist_ok = True)
 
     # loop through subjects
     for subject in subjects:
@@ -77,17 +77,11 @@ if __name__ in "__main__":
 
         # prep contrasts for decoding
         X, y = prep_X_y(contrasts_pos, contrasts_neg)
+        print(X.shape)
 
         # brain mask 
         mask_wb_filename = Path(f"/work/816119/InSpePosNegData/BIDS_2023E/derivatives/sub-{subject}/anat/sub-{subject}_acq-T1sequence_run-1_space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz")
         mask_img = load_img(mask_wb_filename)
-
-        process_mask = get_data(mask_img).astype(int)
-        picked_slice = 29
-        process_mask[..., (picked_slice + 1) :] = 0
-        process_mask[..., :picked_slice] = 0
-        process_mask[:, 30:] = 0
-        process_mask_img = new_img_like(mask_img, process_mask)
 
         cv = KFold(n_splits=10, shuffle=True, random_state=42)
 
