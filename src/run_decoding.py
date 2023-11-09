@@ -23,8 +23,6 @@ def load_contrasts_dir(path:Path):
         # load in contrast
         with open(f, "rb") as f:
             contrast = pickle.load(f)
-        
-        contrast = contrast.get_fdata()
 
         # append to list
         if "positive" in f.name:
@@ -41,7 +39,6 @@ def prep_X_y(pos_contrasts:list, neg_contrasts:list):
     
     # concatenate all contrasts
     y = [1] * len(pos_contrasts) + [0] * len(neg_contrasts)
-
 
     # concatenate all contrasts and turn into numpy array
     X = pos_contrasts + neg_contrasts
@@ -77,20 +74,18 @@ if __name__ in "__main__":
 
         # prep contrasts for decoding
         X, y = prep_X_y(contrasts_pos, contrasts_neg)
-        print(X.shape)
 
         # brain mask 
-        mask_wb_filename = Path(f"/work/816119/InSpePosNegData/BIDS_2023E/derivatives/sub-{subject}/anat/sub-{subject}_acq-T1sequence_run-1_space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz")
+        mask_wb_filename = Path('/work/816119/InSpePosNegData/BIDS_2023E/derivatives/sub-0116/anat/sub-0116_acq-T1sequence_run-1_space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz')
         mask_img = load_img(mask_wb_filename)
 
         cv = KFold(n_splits=10, shuffle=True, random_state=42)
 
 
-    
         searchlight = SearchLight(
             mask_img,
             estimator=LinearSVC(penalty='l2'),
-            process_mask_img=process_mask_img,
+            #process_mask_img=process_mask_img,
             radius=5, 
             n_jobs=-1,
             verbose=10, 
