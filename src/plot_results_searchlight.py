@@ -37,7 +37,7 @@ def plot_searchlight_subject(searchlight_img, subject_id, ax, threshold = False)
         cmap='RdBu',
         threshold = threshold,
         vmin = threshold,
-        vmax = 100,
+        vmax = 1,
         axes=ax)
     
     ax.set_title(f"Subject {subject_id}")
@@ -97,9 +97,6 @@ if __name__ in "__main__":
 
         mask_wb_filename=f'/work/816119/InSpePosNegData/BIDS_2023E/derivatives/sub-{subject}/anat/sub-{subject}_acq-T1sequence_run-1_space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz'
         anat_filename=f'/work/816119/InSpePosNegData/BIDS_2023E/derivatives/sub-{subject}/anat/sub-{subject}_acq-T1sequence_run-1_space-MNI152NLin2009cAsym_desc-preproc_T1w.nii.gz'
-
-        #Create an image of the searchlight scores
-        searchlight_img = new_img_like(anat_filename, searchlight.scores_)
         
         search_lights.append(searchlight_img)
     
