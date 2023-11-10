@@ -79,7 +79,7 @@ if __name__ in "__main__":
         mask_wb_filename = Path('/work/816119/InSpePosNegData/BIDS_2023E/derivatives/sub-0116/anat/sub-0116_acq-T1sequence_run-1_space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz')
         mask_img = load_img(mask_wb_filename)
 
-        cv = KFold(n_splits=5, shuffle=True, random_state=42)
+        cv = KFold(n_splits=3, shuffle=True, random_state=42)
 
         searchlight = SearchLight(
             mask_img,
