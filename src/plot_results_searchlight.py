@@ -30,11 +30,14 @@ def plot_searchlight_subject(searchlight_img, subject_id, ax, threshold = False)
 
     """
 
-    plotting.plot_glass_brain(
+    plot_glass_brain(
         searchlight_img,
         colorbar=True,
         plot_abs=False, 
         cmap='RdBu',
+        threshold = threshold,
+        vmin = threshold,
+        vmax = 100,
         axes=ax)
     
     ax.set_title(f"Subject {subject_id}")
