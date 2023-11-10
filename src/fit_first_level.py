@@ -100,8 +100,8 @@ def add_button_presses(event_df, trial_type_col = "trial_type", response_col = "
         
         if np.isnan(onset) == False: # not including missed button presses where RT is NaN
             # new row to add to the dataframe
-            # NOTE: NOT SURE WHAT THE APPROPRIATE DURATION IS HERE?
-            new_row = pd.DataFrame({"onset": [onset], "duration": [0.5], "trial_type": ["button_press"]})
+            # NOTE: duration set to 0 as discussed with Mikkel
+            new_row = pd.DataFrame({"onset": [onset], "duration": [0], "trial_type": ["button_press"]})
 
             # concatenate the new row to the dataframe
             event_df = pd.concat([event_df, new_row], ignore_index=True)
@@ -155,7 +155,7 @@ def fit_first_level_subject(subject, bids_dir, runs = [1, 2, 3, 4, 5, 6], space 
     fprep_func_paths = [fprep_func_dir / f"sub-{subject}_task-boldinnerspeech_run-{run}_echo-1_space-{space}_desc-preproc_bold.nii.gz" for run in runs]
     
     # prepare event files
-    event_paths = [bids_func_dir / f"sub-{subject}_task-boldinnerspeech_run-{run}_events.tsv" for run in runs]
+    event_paths = [bids_func_dir / f"sub-{subject}_task-boldinnerspeech_run-{run}_echo-1_events.tsv" for run in runs]
     events = [load_prep_events(path) for path in event_paths]
 
     # paths to confounds
