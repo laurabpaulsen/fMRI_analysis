@@ -185,11 +185,11 @@ def fit_first_level_subject(subject, bids_dir, runs = [1, 2, 3, 4, 5, 6], space 
 
 if __name__ in "__main__":
     path = Path(__file__).parents[1]
-    output_path = path / "flms"
+    output_path = path / "data" / "flms"
 
     # make sure that output path exists
     if not output_path.exists():
-        output_path.mkdir()
+        output_path.mkdir(parents = True)
 
     bids_dir = Path("/work/816119/InSpePosNegData/BIDS_2023E")
     subjects = ["0116", "0117", "0118", "0119", "0120", "0121", "0122", "0123"]
