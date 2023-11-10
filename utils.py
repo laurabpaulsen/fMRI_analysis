@@ -3,6 +3,31 @@ import pickle
 from nilearn import plotting
 import matplotlib.pyplot as plt
 from nilearn.glm import threshold_stats_img
+from scipy.stats import binom
+
+def chance_level(n, alpha = 0.001, p = 0.5):
+    """
+    THIS FUNCTION WAS COPIED DIRECTLY FROM https://github.com/laurabpaulsen/DecodingMagneto/blob/main/utils/analysis/tools.py
+    Calculates the chance level for a given number of trials and alpha level
+
+    Parameters
+    ----------
+    n : int
+        The number of trials.
+    alpha : float
+        The alpha level.
+    p : float
+        The probability of a correct response.
+
+    Returns
+    -------
+    chance_level : float
+        The chance level.
+    """
+    k = binom.ppf(1-alpha, n, p)
+    chance_level = k/n
+    
+    return chance_level
 
 def load_first_level_models(path: Path, return_subject_ids = False):
     """
