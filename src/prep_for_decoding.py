@@ -137,10 +137,8 @@ if __name__ in "__main__":
 
             # get the contrasts
             for reg in regressor_names:
-
                 contrast = flm.compute_contrast(reg, output_type = "z_score")
-                # shape of contrast
-                print(f"Shape of contrast: {contrast.shape}")
+                
                 # save to pickle
                 file_name = f"contrast_{reg}_run_{i}.pkl"
 
