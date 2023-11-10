@@ -10,9 +10,9 @@ from utils import load_first_level_models, plot_contrast_all_subjects
 
 if __name__ in "__main__":
     path = Path(__file__).parents[1]
-    flm_path = Path("/work/LauraBockPaulsen#1941/fMRI_analysis/flms")
+    flm_path = flm_path = path / "data" / "flms"
     flms, subject_ids = load_first_level_models(flm_path, return_subject_ids = True)
-    output_path = path / "fig" 
+    output_path = path / "fig" / "contrasts"
 
     if not output_path.exists():
         output_path.mkdir(parents = True)
