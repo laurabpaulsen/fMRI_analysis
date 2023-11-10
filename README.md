@@ -31,9 +31,15 @@ Calculate and plot the contrast between positive and negative inner speech
 python src/contrast_inner_speech.py
 ```
 
-Run decoding analysis
+Prepare data for classification by getting the single trial beta-maps
 ```
-python src/decoding.py # NOT IMPLEMENTED YET
+python src/prep_for_decoding.py
+```
+
+
+Run searchlight decoding analysis
+```
+python src/run_decoding_searchlight.py
 ```
 
 ## Project organisation
