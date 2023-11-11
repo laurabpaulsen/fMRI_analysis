@@ -61,7 +61,7 @@ def plot_searchlight_all_subjects(search_light_imgs, subject_ids, threshold = No
     -------
     None.
     """
-    fig, axes = plt.subplots(int(len(flms)/2), 2, figsize=(10, 12))
+    fig, axes = plt.subplots(int(len(search_light_imgs)/2), 2, figsize=(10, 12))
     
     for i, (searchlight_img, subject_id) in enumerate(zip(search_light_imgs, subject_ids)):
         ax = axes.flatten()[i]
