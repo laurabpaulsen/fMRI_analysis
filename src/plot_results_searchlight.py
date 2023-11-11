@@ -9,7 +9,7 @@ import sys
 sys.path.append(str(Path(__file__).parents[1]))
 from utils import chance_level
 
-def plot_searchlight_subject(searchlight_img, ax, threshold = False, title = None, plotting_function = plot_glass_brain()):
+def plot_searchlight_subject(searchlight_img, ax, threshold = False, title = None, plotting_function = plot_glass_brain):
     """
     Calculates and plots the contrast for the given first level model.
 
@@ -36,10 +36,8 @@ def plot_searchlight_subject(searchlight_img, ax, threshold = False, title = Non
     plotting_function(
         searchlight_img,
         colorbar=True,
-        plot_abs=False, 
         cmap='RdBu',
         threshold = threshold,
-        vmin = threshold,
         vmax = 1,
         axes=ax)
     
