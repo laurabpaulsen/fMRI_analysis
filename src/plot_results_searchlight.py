@@ -9,7 +9,7 @@ import sys
 sys.path.append(str(Path(__file__).parents[1]))
 from utils import chance_level
 
-def plot_searchlight_subject(searchlight_img, ax, threshold = False, title = None, plotting_function = plot_glass_brain):
+def plot_searchlight_subject(searchlight_img, ax, threshold = False, title = None, plotting_function = plot_glass_brain, **kwargs):
     """
     Calculates and plots the contrast for the given first level model.
 
@@ -25,6 +25,8 @@ def plot_searchlight_subject(searchlight_img, ax, threshold = False, title = Non
         Title of the ax. Defaults to None.
     plotting_function : function
         The plotting function to use. Defaults to plot_glass_brain.
+    **kwargs : dict
+        Additional arguments to pass to the plotting function.
     
 
     Returns
@@ -39,13 +41,14 @@ def plot_searchlight_subject(searchlight_img, ax, threshold = False, title = Non
         cmap='RdBu',
         threshold = threshold,
         vmax = 1,
-        axes=ax)
+        axes=ax,
+        **kwargs)
     
     if title:
         ax.set_title(title)
 
 
-def plot_searchlight_all_subjects(search_light_imgs, subject_ids, threshold = None, save_path = None):
+def plot_searchlight_all_subjects(search_light_imgs, subject_ids, threshold = None, save_path = None, plotting_function = plot_glass_brain, **kwargs):
     """
     Plots a given contrast for all subjects in the given list of first level models.
 
@@ -68,7 +71,7 @@ def plot_searchlight_all_subjects(search_light_imgs, subject_ids, threshold = No
     
     for i, (searchlight_img, subject_id) in enumerate(zip(search_light_imgs, subject_ids)):
         ax = axes.flatten()[i]
-        plot_searchlight_subject(searchlight_img, ax, threshold = threshold, title = f"Subject {subject_id}", plotting_function = plot_stat_map)
+        plot_searchlight_subject(searchlight_img, ax, threshold = threshold, title = f"Subject {subject_id}", plotting_function = plotting_function, **kwargs)
 
     # add super title in bold
     fig.suptitle(f"Searchlight", fontweight="bold", fontsize=20)
@@ -107,6 +110,19 @@ if __name__ in "__main__":
         search_lights.append(searchlight_img)
     
     
-    plot_searchlight_all_subjects(search_lights, subjects, threshold = chance, save_path = fig_path / "search_light_all_subjects_glass_brain.png" )
+    plot_searchlight_all_subjects(
+        search_lights, subjects, 
+        threshold = chance, 
+        save_path = fig_path / "search_light_all_subjects_glass_brain.png", 
+        plot_abs = False
+        )
     
-    plot_searchlight_all_subjects(search_lights, subjects, threshold = None, save_path = fig_path / "search_light_all_subjects_glass_brain_no_threshold.png" )
+    plot_searchlight_all_subjects(
+        search_lights, 
+        subjects, 
+        threshold = chance, 
+        save_path = fig_path / "search_light_all_subjects_stat_map.png", 
+        plotting_function = plot_stat_map, 
+        cut_coords=[-30,-20,-10,0,10,20,30],
+        display_mode='z'
+        )
