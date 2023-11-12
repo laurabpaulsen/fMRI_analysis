@@ -138,6 +138,10 @@ if __name__ in "__main__":
             # get the names of the regressors
             regressor_names = flm.design_matrices_[0].columns
 
+            # get the events 
+            events = flm.design_matrices_[0].values
+            print(events)
+
             total_n_columns = len(regressor_names)
 
             # only keep the ones with positive or negative
@@ -158,15 +162,6 @@ if __name__ in "__main__":
                 contrast = flm.compute_contrast(contrasts[i], output_type = "effect_size")
                 beta_maps.append(contrast)
 
-            #for reg in regressor_names:
-            #    contrast = flm.compute_contrast(reg, output_type = "effect_size")
-
-
-            #    beta_maps.append(contrast)
-                
-                # save to pickle
-                #file_name = f"contrast_{reg}_run_{i}.pkl"
-                # pickle.dump(contrast, open(outpath_subject / file_name, 'wb'))
             
             # vstack the beta maps
             beta_maps = np.vstack(beta_maps)
