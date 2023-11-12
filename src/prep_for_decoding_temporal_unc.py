@@ -138,6 +138,8 @@ if __name__ in "__main__":
             # get the names of the regressors
             regressor_names = flm.design_matrices_[0].columns
 
+            total_n_columns = len(regressor_names)
+
             # only keep the ones with positive or negative
             regressor_names = [name for name in regressor_names if "positive" in name or "negative" in name]
             
@@ -145,6 +147,11 @@ if __name__ in "__main__":
             # get the contrasts
             for reg in regressor_names:
                 contrast = flm.compute_contrast(reg, output_type = "effect_size")
+
+                # pad the contrast with zeros
+                if contrast.shape[0] < total_n_columns:
+                    diff = total_n_columns - contrast.shape[0]
+                    contrast = np.pad(contrast, ((0, diff), (0, 0), (0, 0)), mode = "constant")
 
                 beta_maps.append(contrast)
                 
