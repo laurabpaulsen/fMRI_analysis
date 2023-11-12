@@ -34,35 +34,32 @@ if __name__ in "__main__":
     for subject in subjects:
         print(f"Running decoding analysis for subject {subject}...")
 
+        mask = nib.load(f"/work/816119/InSpePosNegData/BIDS_2023E/derivatives/sub-{subject}/func/sub-{subject}_task-boldinnerspeech_run-1_space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz")
+
+
         # load data for subject
         beta_maps = []
         ys = []
         for run in runs:
             path_beta_maps = contrasts_path / f"sub-{subject}" / f"beta_maps_temporal_unc_run_{run}.pkl"
-            beta_maps = pickle.load(open(path_beta_maps, "rb"))
+            beta_map = pickle.load(open(path_beta_maps, "rb"))
 
             # load trial types
             path_ys = contrasts_path / f"sub-{subject}" / f"conditions_run_{run}.pkl"
             y = pickle.load(open(path_ys, "rb"))
-            
-            index = [i for i, y in enumerate(ys) if "positive" in y or "negative" in y]
-            y = np.array(ys)[index]
+        
 
-            beta_maps.append(beta_maps[index])
+            beta_maps.append(new_img_like(mask))
             ys.append(y)
 
 
         
-        # stack the beta maps
-        beta_maps = np.vstack(beta_maps)
+
         # stack the ys
         ys = np.hstack(ys)
+        print(beta_maps)
 
         # get the positive and negative trials
-
-
-    
-
 
 
 
@@ -86,7 +83,7 @@ if __name__ in "__main__":
             )
         
 
-        searchlight.fit(X, y)
+        searchlight.fit(beta_maps[0], ys)
 
         # save results
         with open(results_path / f"sub-{subject}.pkl", "wb") as f:
