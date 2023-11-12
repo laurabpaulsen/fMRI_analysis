@@ -175,7 +175,7 @@ if __name__ in "__main__":
             design_matrix = flm.design_matrices_[0]
 
             # get temporally uncorrerlated beta maps
-            beta_maps_temporal_unc = sqrtm(design_matrix.T @ design_matrix) @ beta_maps
+            beta_maps_temporal_unc = sqrtm(design_matrix.T @ design_matrix) @ beta_maps.get_fdata()
 
             # save to pickle
             file_name = f"beta_maps_temporal_unc_run_{i}.pkl"
