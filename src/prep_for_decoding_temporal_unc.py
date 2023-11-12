@@ -144,16 +144,25 @@ if __name__ in "__main__":
             regressor_names = [name for name in regressor_names if "positive" in name or "negative" in name]
             
             beta_maps = [] 
+            
+            # Make an identity matrix with N= number of trials
+            contrasts=np.eye(total_n_columns)
+
+            #Find difference between columns in design matrix and number of trials
+            dif = contrasts.shape[1]-total_n_columns
+
+            #Pad with zeros
+            contrasts = np.pad(contrasts, ((0,0),(0,dif)),'constant')
             # get the contrasts
-            for reg in regressor_names:
-                contrast = flm.compute_contrast(reg, output_type = "effect_size")
-
-                # pad the contrast with zeros
-                if contrast.shape[0] < total_n_columns:
-                    diff = total_n_columns - contrast.shape[0]
-                    contrast = np.pad(contrast, ((0, diff), (0, 0), (0, 0)), mode = "constant")
-
+            for i in range(contrasts.shape[0]):
+                contrast = flm.compute_contrast(contrasts[i], output_type = "effect_size")
                 beta_maps.append(contrast)
+
+            #for reg in regressor_names:
+            #    contrast = flm.compute_contrast(reg, output_type = "effect_size")
+
+
+            #    beta_maps.append(contrast)
                 
                 # save to pickle
                 #file_name = f"contrast_{reg}_run_{i}.pkl"
