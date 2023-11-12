@@ -128,8 +128,8 @@ if __name__ in "__main__":
         if not outpath_subject.exists():
             outpath_subject.mkdir(exist_ok = True, parents = True)
 
-        mask = nib.load(f"/work/816119/InSpePosNegData/BIDS_2023E/derivatives/sub-{subject}/anat/sub-{subject}_acq-T1sequence_run-1_space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz")
-        
+        mask = nib.load(f"/work/816119/InSpePosNegData/BIDS_2023E/derivatives/sub-{subject}/func/sub-{subject}_task-boldinnerspeech_run-1_space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz")
+       
         flms = fit_first_level_subject_per_trial(subject, bids_dir, mask = mask)
 
 
