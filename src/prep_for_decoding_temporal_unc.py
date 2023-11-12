@@ -11,6 +11,7 @@ from scipy.linalg import sqrtm
 import nibabel as nib
 from nilearn.glm.first_level import FirstLevelModel
 import pickle
+from nilearn.masking import apply_mask
 
 # local imports
 import sys
@@ -156,7 +157,8 @@ if __name__ in "__main__":
             # get the contrasts
             for i in range(contrasts.shape[0]):
                 contrast = flm.compute_contrast(contrasts[i], output_type = "effect_size")
-                beta_maps.append(contrast)
+                
+                beta_maps.append(apply_mask(contrast, mask))
 
             #for reg in regressor_names:
             #    contrast = flm.compute_contrast(reg, output_type = "effect_size")
@@ -175,14 +177,14 @@ if __name__ in "__main__":
             design_matrix = flm.design_matrices_[0]
 
             # get temporally uncorrerlated beta maps
-            beta_maps_temporal_unc = sqrtm(design_matrix.T @ design_matrix) @ beta_maps.get_fdata()
+            beta_maps_temporal_unc = sqrtm(design_matrix.T @ design_matrix) @ beta_maps
 
             # save to pickle
-            file_name = f"beta_maps_temporal_unc_run_{i}.pkl"
+            file_name = f"beta_maps_temporal_unc_run_{run+1}.pkl"
             pickle.dump(beta_maps_temporal_unc, open(outpath_subject / file_name, 'wb'))
 
             # save the conditions to a pickle
-            file_name = f"conditions_run_{i}.pkl"
+            file_name = f"conditions_run_{run+1}.pkl"
             pickle.dump(regressor_names, open(outpath_subject / file_name, 'wb'))
 
 
