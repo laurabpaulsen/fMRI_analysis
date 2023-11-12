@@ -38,7 +38,7 @@ def modify_events(event_df):
     return event_df
 
 
-def fit_first_level_subject_per_trial(subject, bids_dir, mask, runs = [1, 2, 3, 4, 5, 6], space = "MNI152NLin2009cAsym"):
+def fit_first_level_subject_per_trial(subject, bids_dir, mask, runs = [1], space = "MNI152NLin2009cAsym"):
     """
     Fits a first level model for one subject, with one regressor per trial
 
@@ -119,7 +119,7 @@ if __name__ in "__main__":
     outpath = path / "data" / "decoding" 
 
     bids_dir = Path("/work/816119/InSpePosNegData/BIDS_2023E")
-    subjects = ["0116", "0117", "0118", "0119", "0120", "0121", "0122", "0123"]
+    subjects = ["0116"]
 
     
     for subject in subjects:
