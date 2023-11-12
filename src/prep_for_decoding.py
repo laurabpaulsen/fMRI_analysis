@@ -6,12 +6,16 @@ This script prepares the data for decoding.
 from pathlib import Path
 from fit_first_level import load_prep_events, load_prep_confounds
 from pathlib import Path
-import numpy as np
-import pandas as pd
-from nilearn import masking
+from scipy.linalg import sqrtm
 import nibabel as nib
 from nilearn.glm.first_level import FirstLevelModel
 import pickle
+
+# local imports
+import sys
+sys.path.append(str(Path(__file__).parents[1]))
+from utils import load_first_level_models, plot_contrast_all_subjects
+
 
 def modify_events(event_df):
     """
@@ -33,7 +37,7 @@ def modify_events(event_df):
     return event_df
 
 
-def fit_first_level_subject_per_trial(subject, bids_dir, runs = [1, 2, 3, 4, 5, 6], space = "MNI152NLin2009cAsym"):
+def fit_first_level_subject_per_trial(subject, bids_dir, mask, runs = [1, 2, 3, 4, 5, 6], space = "MNI152NLin2009cAsym"):
     """
     Fits a first level model for one subject, with one regressor per trial
 
@@ -44,6 +48,9 @@ def fit_first_level_subject_per_trial(subject, bids_dir, runs = [1, 2, 3, 4, 5, 
 
     bids_dir : Path
         Path to the root of the bids directory.
+    
+    mask : nibabel.nifti1.Nifti1Image
+        Mask to use for the first level model.
 
     runs : list of int
         List of runs to load.
@@ -74,11 +81,6 @@ def fit_first_level_subject_per_trial(subject, bids_dir, runs = [1, 2, 3, 4, 5, 
     # paths to confounds
     confounds_paths = [fprep_func_dir / f"sub-{subject}_task-boldinnerspeech_run-{run}_desc-confounds_timeseries.tsv" for run in runs]
     confounds = [load_prep_confounds(path) for path in confounds_paths]
-    
-    # prep masks
-    mask_paths = [fprep_func_dir / f"sub-{subject}_task-boldinnerspeech_run-{run}_space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz" for run in runs]
-    masks = [nib.load(path) for path in mask_paths]
-
 
     # fit first level model for each run
     flms = []
@@ -89,7 +91,7 @@ def fit_first_level_subject_per_trial(subject, bids_dir, runs = [1, 2, 3, 4, 5, 
         # fit first level model
         first_level_model = FirstLevelModel(
             t_r=int(nib.load(fprep_func_paths[0]).header['pixdim'][4]), 
-            mask_img = masks[0], 
+            mask_img = mask, 
             slice_time_ref = 0.5,
             hrf_model = "glover",
             )
@@ -98,7 +100,6 @@ def fit_first_level_subject_per_trial(subject, bids_dir, runs = [1, 2, 3, 4, 5, 
         flm = first_level_model.fit(fprep_func_paths[i], events[i], confounds[i])
         
         flms.append(flm)
-
     
     return flms
 
@@ -118,6 +119,7 @@ if __name__ in "__main__":
 
     bids_dir = Path("/work/816119/InSpePosNegData/BIDS_2023E")
     subjects = ["0116", "0117", "0118", "0119", "0120", "0121", "0122", "0123"]
+
     
     for subject in subjects:
         outpath_subject = outpath / f"sub-{subject}"
@@ -125,8 +127,11 @@ if __name__ in "__main__":
         # ensure outpath exists 
         if not outpath_subject.exists():
             outpath_subject.mkdir(exist_ok = True, parents = True)
+
+        mask = nib.load(f"/work/816119/InSpePosNegData/BIDS_2023E/derivatives/sub-{subject}/anat/sub-{subject}_acq-T1sequence_run-1_space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz")
         
-        flms = fit_first_level_subject_per_trial(subject, bids_dir)
+        flms = fit_first_level_subject_per_trial(subject, bids_dir, mask = mask)
+
 
         for i, flm in enumerate(flms):
             # get the names of the regressors
