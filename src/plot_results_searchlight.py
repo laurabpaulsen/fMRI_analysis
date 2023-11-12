@@ -2,7 +2,7 @@ import pickle
 from pathlib import Path
 import matplotlib.pyplot as plt
 from nilearn.plotting import plot_glass_brain, plot_stat_map
-from nilearn.image import new_img_like, load_img
+from nilearn.image import new_img_like
 
 # local imports
 import sys
