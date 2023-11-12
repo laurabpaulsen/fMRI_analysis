@@ -142,7 +142,7 @@ if __name__ in "__main__":
 
             # get the contrasts
             for reg in regressor_names:
-                contrast = flm.compute_contrast(reg, output_type = "z_score")
+                contrast = flm.compute_contrast(reg, output_type = "effect_size")
                 
                 # save to pickle
                 file_name = f"contrast_{reg}_run_{i}.pkl"
