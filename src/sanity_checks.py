@@ -28,25 +28,38 @@ if __name__ in "__main__":
         output_type = "z_score"
         )
     """
-    subject = "0119"
+    subjects = ["0116", "0117", "0118", "0119", "0120", "0121", "0122", "0123"]
+
     bids_dir = Path("/work/816119/InSpePosNegData/BIDS_2023E")
-    bids_func_dir  = bids_dir / f"sub-{subject}" / "func"
-    # plot button presses for subject 0119
-    # load tsv
-    tsvs = [bids_func_dir / f"sub-{subject}_task-boldinnerspeech_run-{run}_echo-1_events.tsv" for run in [1, 2, 3, 4, 5, 6]]
 
-    dfs = [pd.read_csv(tsv, sep = "\t") for tsv in tsvs]
+    
+    for subject in subjects:
+        bids_func_dir  = bids_dir / f"sub-{subject}" / "func"
+        # load tsv
+        tsvs = [bids_func_dir / f"sub-{subject}_task-boldinnerspeech_run-{run}_echo-1_events.tsv" for run in [1, 2, 3, 4, 5, 6]]
 
-    dfs = [df[df["trial_type"] == "IMG_BI"] for df in dfs]
-    print(dfs[0].head())
+        dfs = [pd.read_csv(tsv, sep = "\t") for tsv in tsvs]
 
-    # plot button presses
-    fig, axes = plt.subplots(2, len(dfs) // 2, figsize = (20, 10))
+        dfs = [df[df["trial_type"] == "IMG_BI"] for df in dfs]
 
-    for i, ax in enumerate(axes.flatten()):
-        df = dfs[i]
-        ax.scatter(df["onset"], df["RT"])
-        ax.set_title(f"Run {i + 1}")
+        # set nans to 0 in response time
+        for df in dfs:
+            df["RT"] = df["RT"].fillna(0)
+
+        # plot button presses
+        fig, axes = plt.subplots(len(dfs) // 2, 2, figsize = (20, 10))
+
+        for i, ax in enumerate(axes.flatten()):
+            df = dfs[i]
+
+            # if 0, then no button press plot at zero and color red
+            no_reaction = df[df["RT"] == 0]
+            reaction = df[df["RT"] != 0]
+
+            ax.scatter(no_reaction["onset"], no_reaction["RT"], color = "red")
+            ax.scatter(reaction["onset"], reaction["RT"], color = "green")
+            ax.set_title(f"Run {i + 1}")
 
 
-    plt.savefig(output_path / f"button_presses_{subject}.png")
+        plt.savefig(output_path / f"button_presses_{subject}.png")
+        plt.close()
