@@ -7,11 +7,12 @@ from nilearn.image import load_img, concat_imgs
 from nilearn.decoding import SearchLight
 from sklearn.svm import LinearSVC
 import numpy as np
-from nilearn.input_data import NiftiMasker
+from nilearn.maskers import NiftiMasker
 from nilearn.image import new_img_like
 from nilearn import plotting
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection import permutation_test_score
+from sklearn.model_selection import train_test_split
 
 
 def load_contrasts_dir(path:Path):
@@ -49,12 +50,8 @@ def prep_X_y(pos_contrasts:list, neg_contrasts:list):
     # create list of indices for cross validation
     indices = np.arange(len(y))
 
-    # shuffle indices
-    np.random.shuffle(indices)
-
     # split into train and test set (50/50)
-    train_indices = indices[:len(indices)//2]
-    test_indices = indices[len(indices)//2:]
+    train_indices, test_indices = train_test_split(indices, test_size=0.2, random_state=42, stratify = y)
 
     # create train and test set
     X_train = [X[i] for i in train_indices]
@@ -154,9 +151,9 @@ if __name__ in "__main__":
         # mask the images
         masker = NiftiMasker(mask_img=process_mask2_img, standardize = False)
         fmri_masked = masker.fit_transform(X_cl)
-        print("now running classifier")
+        print("Now running classifier")
         score_cv_test, scores_perm, pvalue= permutation_test_score(
-            GaussianNB(), fmri_masked, y_sl, cv=10, n_permutations=1000, 
+            GaussianNB(), fmri_masked, y_cl, cv=10, n_permutations=1000, 
             n_jobs=-1, random_state=0, verbose=0, scoring=None)
         
         # write results to file
