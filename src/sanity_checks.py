@@ -32,34 +32,31 @@ if __name__ in "__main__":
 
     bids_dir = Path("/work/816119/InSpePosNegData/BIDS_2023E")
 
-    
-    for subject in subjects:
+
+    fig, axes = plt.subplots(2,4, figsize = (20, 10))
+
+    for i, subject in enumerate(subjects):
+        ax = axes.flatten()[i]
         bids_func_dir  = bids_dir / f"sub-{subject}" / "func"
         # load tsv
         tsvs = [bids_func_dir / f"sub-{subject}_task-boldinnerspeech_run-{run}_echo-1_events.tsv" for run in [1, 2, 3, 4, 5, 6]]
+        
+        dfs = []
+        for tsv in tsvs:
+            dfs.append(pd.read_csv(tsv, sep = "\t"))
 
-        dfs = [pd.read_csv(tsv, sep = "\t") for tsv in tsvs]
+        # exclude rows with no RT
+        dfs = [df[df["RT"] > 0] for df in dfs]
+        
+        # make a bar plot with the number of IMG_BI events per run
+        img_bi = [df[df["trial_type"] == "IMG_BI"].shape[0] for df in dfs]
 
-        dfs = [df[df["trial_type"] == "IMG_BI"] for df in dfs]
+        # plot the bar plot
+        ax.bar(range(1,7), img_bi)
 
-        # set nans to 0 in response time
-        for df in dfs:
-            df["RT"] = df["RT"].fillna(0)
-
-        # plot button presses
-        fig, axes = plt.subplots(len(dfs) // 2, 2, figsize = (20, 10))
-
-        for i, ax in enumerate(axes.flatten()):
-            df = dfs[i]
-
-            # if 0, then no button press plot at zero and color red
-            no_reaction = df[df["RT"] == 0]
-            reaction = df[df["RT"] != 0]
-
-            ax.scatter(no_reaction["onset"], no_reaction["RT"], color = "red")
-            ax.scatter(reaction["onset"], reaction["RT"], color = "green")
-            ax.set_title(f"Run {i + 1}")
+    
+    plt.savefig(output_path / "img_bi_per_run.png")
+        
 
 
-        plt.savefig(output_path / f"button_presses_{subject}.png")
-        plt.close()
+
