@@ -3,9 +3,7 @@ This script loads in the contrasts made in "prep_for_decoding.py" and runs a dec
 """
 import pickle
 from pathlib import Path
-import numpy as np
-import nibabel as nib
-from nilearn.image import load_img, new_img_like, concat_imgs
+from nilearn.image import load_img, concat_imgs
 from nilearn.decoding import SearchLight
 from sklearn.svm import LinearSVC
 from sklearn.model_selection import KFold
