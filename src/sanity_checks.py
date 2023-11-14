@@ -2,6 +2,8 @@
 This file holds the code for generating plots used for sanity checks.
 """
 from pathlib import Path
+import pandas as pd
+import matplotlib.pyplot as plt
 
 # local imports
 import sys
@@ -25,3 +27,23 @@ if __name__ in "__main__":
         contrast = "button_press", 
         output_type = "z_score"
         )
+
+    subject = "0119"
+    # plot button presses for subject 0119
+    # load tsv
+    tsvs = [path / "events" / f"sub-{subject}_task-boldinnerspeech_run-{run}_echo-1_events.tsv" for run in [1, 2, 3, 4, 5, 6]]
+
+    dfs = [pd.read_csv(tsv, sep = "\t") for tsv in tsvs]
+
+    dfs = [df[df["trial_type"] == "IMG_BI"] for df in dfs]
+
+    # plot button presses
+    fig, axes = plt.subplots(2, len(dfs) // 2, figsize = (20, 10))
+
+    for i, ax in enumerate(axes.flatten()):
+        df = dfs[i]
+        ax.scatter(df["onset"], df["duration"])
+        ax.set_title(f"Run {i + 1}")
+
+
+    plt.savefig(output_path / f"button_presses_{subject}.png")
