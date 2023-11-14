@@ -33,7 +33,7 @@ if __name__ in "__main__":
     bids_dir = Path("/work/816119/InSpePosNegData/BIDS_2023E")
 
 
-    fig, axes = plt.subplots(4, 2, figsize = (20, 10))
+    fig, axes = plt.subplots(4, 2, figsize = (10, 12))
 
     for i, subject in enumerate(subjects):
         ax = axes.flatten()[i]
@@ -60,7 +60,7 @@ if __name__ in "__main__":
         ax.set_xlabel("Run")
         ax.set_ylabel("Number of button presses")
 
-    
+    plt.tight_layout()
     plt.savefig(output_path / "img_bi_per_run.png")
         
 
