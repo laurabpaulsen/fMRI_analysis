@@ -15,6 +15,8 @@ from sklearn.model_selection import permutation_test_score
 if __name__ in "__main__":
     path = Path(__file__).parents[1]
 
+    output_path = path / "data" / "classification"
+
     # path to searchlight results
     searchlight_path = path / "data" / "searchlight"
 
@@ -61,7 +63,11 @@ if __name__ in "__main__":
             GaussianNB(), fmri_masked, y, cv=10, n_permutations=1000, 
             n_jobs=-1, random_state=0, verbose=0, scoring=None)
         
-        print("Classification Accuracy: %s (pvalue : %s)" % (score_cv_test, pvalue))
+        # write results to file
+        with open(output_path / f"sub-{subject}_classification.txt", "w") as f:
+            f.write(f"Classification Accuracy: {score_cv_test} (pvalue : {pvalue})")
+
+        print(f"Classification Accuracy: {score_cv_test} (pvalue : {pvalue})")
 
 
 
