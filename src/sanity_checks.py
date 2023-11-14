@@ -18,7 +18,7 @@ if __name__ in "__main__":
 
     if not output_path.exists():
         output_path.mkdir(parents = True)
-
+    """
     # plot button press contrast for all subjects
     plot_contrast_all_subjects(
         flms, subject_ids, 
@@ -27,22 +27,25 @@ if __name__ in "__main__":
         contrast = "button_press", 
         output_type = "z_score"
         )
-
+    """
     subject = "0119"
+    bids_dir = Path("/work/816119/InSpePosNegData/BIDS_2023E")
+    bids_func_dir  = bids_dir / f"sub-{subject}" / "func"
     # plot button presses for subject 0119
     # load tsv
-    tsvs = [path / "events" / f"sub-{subject}_task-boldinnerspeech_run-{run}_echo-1_events.tsv" for run in [1, 2, 3, 4, 5, 6]]
+    tsvs = [bids_func_dir / f"sub-{subject}_task-boldinnerspeech_run-{run}_echo-1_events.tsv" for run in [1, 2, 3, 4, 5, 6]]
 
     dfs = [pd.read_csv(tsv, sep = "\t") for tsv in tsvs]
 
     dfs = [df[df["trial_type"] == "IMG_BI"] for df in dfs]
+    print(dfs[0].head())
 
     # plot button presses
     fig, axes = plt.subplots(2, len(dfs) // 2, figsize = (20, 10))
 
     for i, ax in enumerate(axes.flatten()):
         df = dfs[i]
-        ax.scatter(df["onset"], df["duration"])
+        ax.scatter(df["onset"], df["RT"])
         ax.set_title(f"Run {i + 1}")
 
 
