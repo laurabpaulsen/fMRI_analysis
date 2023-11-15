@@ -44,13 +44,13 @@ def prep_X_y(pos_contrasts:list, neg_contrasts:list):
     # concatenate all contrasts
     y = [1] * len(pos_contrasts) + [0] * len(neg_contrasts)
 
-    # concatenate all contrasts and turn into numpy array
+    # concatenate all contrasts
     X = pos_contrasts + neg_contrasts
 
     # create list of indices for cross validation
     indices = np.arange(len(y))
 
-    # split into train and test set (50/50)
+    # split into train and test set
     train_indices, test_indices = train_test_split(indices, test_size=0.2, random_state=42, stratify = y)
 
     # create train and test set
@@ -65,7 +65,6 @@ def prep_X_y(pos_contrasts:list, neg_contrasts:list):
 
 
     return X_train, y_train, X_test, y_test
-
 
 
 
@@ -144,9 +143,6 @@ if __name__ in "__main__":
         fig = plotting.plot_glass_brain(searchlight_img, threshold = cutoff)
         fig.savefig(path / "fig" / f"InSpe_neg_vs_but_searchlightNB_glass_500_{subject}.png", dpi=300)
 
-        # load contrast images
-        contrasts_path = path / "data" / "decoding" / f"sub-{subject}"
-        contrasts_pos, contrasts_neg = load_contrasts_dir(contrasts_path)
 
         # mask the images
         masker = NiftiMasker(mask_img=process_mask2_img, standardize = False)
