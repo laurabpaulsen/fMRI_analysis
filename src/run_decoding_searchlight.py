@@ -145,7 +145,7 @@ if __name__ in "__main__":
         # plot voxels
         #plotting.plot_glass_brain effects
         fig = plotting.plot_glass_brain(searchlight_img, threshold = cutoff)
-        fig.savefig(path / "fig" / f"InSpe_neg_vs_but_searchlightNB_glass_500_{subject}.png", dpi=300)
+        fig.savefig(path / "fig" / f"InSpe_neg_vs_pos_searchlightNB_glass_500_{subject}.png", dpi=300)
 
         # load contrast images
         contrasts_path = path / "data" / "decoding" / f"sub-{subject}"
