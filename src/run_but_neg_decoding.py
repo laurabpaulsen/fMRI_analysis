@@ -29,7 +29,7 @@ def load_contrasts_dir(path:Path):
 
         # append to list
         if "button_press" in f.name:
-            contrasts_pos.append(contrast)
+            contrasts_but.append(contrast)
         elif "negative" in f.name:
             contrasts_neg.append(contrast)
 
@@ -76,7 +76,7 @@ if __name__ in "__main__":
     path = Path(__file__).parents[1]
 
     # path to contrasts
-    contrasts_path = path / "data" / "decoding" 
+    contrasts_path = path / "data" / "decoding_buttonpress" 
 
     subject = "0116"
 
