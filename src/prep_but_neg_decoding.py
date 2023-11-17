@@ -225,6 +225,10 @@ if __name__ in "__main__":
     subject = "0116"
     outpath = path / "data" / "decoding_buttonpress" / subject
 
+    # ensure output path exists
+    if not outpath.exists():
+        outpath.mkdir(exist_ok = True)
+
     mask = nib.load(f"/work/816119/InSpePosNegData/BIDS_2023E/derivatives/sub-{subject}/func/sub-{subject}_task-boldinnerspeech_run-1_space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz")
        
     flms = fit_first_level_subject_per_trial(subject, bids_dir, mask = mask)
