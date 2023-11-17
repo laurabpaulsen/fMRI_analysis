@@ -1,8 +1,5 @@
 """
-This script prepares the data for decoding. 
-- This is done by fitting first level models with design matrices that include one regressor per trial.
-- A contrast is calculated for each regressor, and the resulting maps are saved.
-"""
+
 from pathlib import Path
 from fit_first_level import load_prep_events, load_prep_confounds
 from pathlib import Path

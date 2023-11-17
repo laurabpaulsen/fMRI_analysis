@@ -1,6 +1,3 @@
-"""
-This script loads in the contrasts made in "prep_for_decoding.py" and runs a decoding analysis on them. Each subject is decoded separately, and the results are saved.
-"""
 import pickle
 from pathlib import Path
 from nilearn.image import load_img, concat_imgs
