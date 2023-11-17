@@ -227,7 +227,7 @@ if __name__ in "__main__":
 
     # ensure output path exists
     if not outpath.exists():
-        outpath.mkdir(exist_ok = True)
+        outpath.mkdir(exist_ok = True, parents=True)
 
     mask = nib.load(f"/work/816119/InSpePosNegData/BIDS_2023E/derivatives/sub-{subject}/func/sub-{subject}_task-boldinnerspeech_run-1_space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz")
        
