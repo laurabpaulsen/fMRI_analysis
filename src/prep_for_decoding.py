@@ -1,5 +1,5 @@
 """
-
+"""
 from pathlib import Path
 from fit_first_level import load_prep_events, load_prep_confounds
 from pathlib import Path
@@ -91,6 +91,7 @@ def fit_first_level_subject_per_trial(subject, bids_dir, mask, runs = [1, 2, 3, 
             mask_img = mask, 
             slice_time_ref = 0.5,
             hrf_model = "glover",
+            smoothing_fwhm = 1
             )
         
         # fit the model

@@ -7,7 +7,7 @@ from nilearn.image import load_img, concat_imgs
 from nilearn.decoding import SearchLight
 from sklearn.svm import LinearSVC
 import numpy as np
-from nilearn.input_data import NiftiMasker
+from nilearn.maskers import NiftiMasker
 from nilearn.image import new_img_like
 from nilearn import plotting
 from sklearn.naive_bayes import GaussianNB

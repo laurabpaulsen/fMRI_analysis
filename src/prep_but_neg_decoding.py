@@ -33,7 +33,7 @@ def load_prep_events(path):
     event_df = add_button_presses(event_df)
 
     # exclude button images
-    # event_df = event_df[event_df["trial_type"] != "IMG_BI"]
+    event_df = event_df[event_df["trial_type"] != "IMG_BI"]
 
     # get the data corresponding to the events and only keep the needed columns
     event_df = event_df.loc[:, ["onset", "duration", "trial_type"]]
@@ -200,6 +200,7 @@ def fit_first_level_subject_per_trial(subject, bids_dir, mask, runs = [1, 2, 3, 
             mask_img = mask, 
             slice_time_ref = 0.5,
             hrf_model = "glover",
+            smoothing_fwhm = 1
             )
         
         # fit the model
