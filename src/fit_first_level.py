@@ -166,7 +166,7 @@ def fit_first_level_subject(subject, bids_dir, runs = [1, 2, 3, 4, 5, 6], space 
     confounds = [load_prep_confounds(path) for path in confounds_paths]
     
     # prep masks
-    mask_paths = [fprep_func_dir / f"sub-{subject}_task-boldinnerspeech_run-{run}_space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz" for run in runs]
+    mask_paths = [fprep_func_dir / f"sub-{subject}_task-boldinnerspeech_run-{run}_space-{space}_desc-brain_mask.nii.gz" for run in runs]
     masks = [nib.load(path) for path in mask_paths]
 
     # merge the masks
@@ -178,6 +178,7 @@ def fit_first_level_subject(subject, bids_dir, runs = [1, 2, 3, 4, 5, 6], space 
         mask_img = mask_img, 
         slice_time_ref = 0.5,
         hrf_model = "glover",
+        smoothing_fwhm = 1, 
         verbose = 1
         )
 
