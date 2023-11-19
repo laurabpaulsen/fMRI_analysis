@@ -3,7 +3,7 @@ This script loads in the contrasts made in "prep_for_decoding.py" and runs a dec
 """
 import pickle
 from pathlib import Path
-from nilearn.image import load_img, concat_imgs
+from nilearn.image import load_img, concat_imgs, index_img
 from nilearn.decoding import SearchLight
 from sklearn.svm import LinearSVC
 import numpy as np
@@ -12,6 +12,7 @@ from nilearn.image import new_img_like
 from nilearn import plotting
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection import permutation_test_score
+from sklearn.model_selection import train_test_split
 
 
 def load_contrasts_dir(path:Path):
@@ -28,9 +29,9 @@ def load_contrasts_dir(path:Path):
             contrast = pickle.load(f)
 
         # append to list
-        if "positive" in f.name:
+        if "pos" in f.name:
             contrasts_pos.append(contrast)
-        elif "negative" in f.name:
+        elif "neg" in f.name:
             contrasts_neg.append(contrast)
 
     return contrasts_pos, contrasts_neg
@@ -39,12 +40,13 @@ def prep_X_y(pos_contrasts:list, neg_contrasts:list):
     """
     Prepares contrasts for decoding analysis.
     """
-    
-    # concatenate all contrasts
-    y = [1] * len(pos_contrasts) + [0] * len(neg_contrasts)
+    pos = concat_imgs(pos_contrasts)
+    neg = concat_imgs(neg_contrasts)
 
-    # concatenate all contrasts and turn into numpy array
-    X = pos_contrasts + neg_contrasts
+    X = concat_imgs(pos_contrasts + neg_contrasts)
+
+    # concatenate all contrasts
+    y = [1] * pos.shape[-1] + [0] * neg.shape[-1]
 
     # create list of indices for cross validation
     indices = np.arange(len(y))
@@ -53,18 +55,15 @@ def prep_X_y(pos_contrasts:list, neg_contrasts:list):
     np.random.shuffle(indices)
 
     # split into train and test set (50/50)
-    train_indices = indices[:len(indices)//2]
-    test_indices = indices[len(indices)//2:]
+    train_indices, test_indices = train_test_split(indices, test_size=0.2, random_state=42, stratify = y)
 
     # create train and test set
-    X_train = [X[i] for i in train_indices]
-    X_test = [X[i] for i in test_indices]
     y_train = [y[i] for i in train_indices]
     y_test = [y[i] for i in test_indices]
 
     # concatenate images
-    X_train = concat_imgs(X_train)
-    X_test = concat_imgs(X_test)
+    X_train = index_img(X, train_indices)
+    X_test = index_img(X, test_indices)
 
 
     return X_train, y_train, X_test, y_test
