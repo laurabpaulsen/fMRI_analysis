@@ -51,10 +51,7 @@ def prep_X_y(pos_contrasts:list, neg_contrasts:list):
     # create list of indices for cross validation
     indices = np.arange(len(y))
 
-    # shuffle indices
-    np.random.shuffle(indices)
-
-    # split into train and test set (50/50)
+    # split into train and test set
     train_indices, test_indices = train_test_split(indices, test_size=0.2, random_state=42, stratify = y)
 
     # create train and test set
@@ -67,7 +64,6 @@ def prep_X_y(pos_contrasts:list, neg_contrasts:list):
 
 
     return X_train, y_train, X_test, y_test
-
 
 
 
@@ -146,16 +142,13 @@ if __name__ in "__main__":
         fig = plotting.plot_glass_brain(searchlight_img, threshold = cutoff)
         fig.savefig(path / "fig" / f"InSpe_neg_vs_pos_searchlightNB_glass_500_{subject}.png", dpi=300)
 
-        # load contrast images
-        contrasts_path = path / "data" / "decoding" / f"sub-{subject}"
-        contrasts_pos, contrasts_neg = load_contrasts_dir(contrasts_path)
 
         # mask the images
         masker = NiftiMasker(mask_img=process_mask2_img, standardize = False)
         fmri_masked = masker.fit_transform(X_cl)
-        print("now running classifier")
+        print("Now running classifier")
         score_cv_test, scores_perm, pvalue= permutation_test_score(
-            GaussianNB(), fmri_masked, y_sl, cv=10, n_permutations=1000, 
+            GaussianNB(), fmri_masked, y_cl, cv=10, n_permutations=1000, 
             n_jobs=-1, random_state=0, verbose=0, scoring=None)
         
         # write results to file
