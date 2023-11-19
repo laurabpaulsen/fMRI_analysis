@@ -10,6 +10,12 @@ from scipy.linalg import sqrtm
 import nibabel as nib
 from nilearn.glm.first_level import FirstLevelModel
 import pickle
+import numpy as np
+import matplotlib.pyplot as plt
+from nilearn.glm.first_level import make_first_level_design_matrix
+from nilearn.masking import unmask
+from nilearn.image import index_img
+from nilearn.masking import apply_mask
 
 # local imports
 import sys
@@ -33,6 +39,8 @@ def modify_events(event_df):
     # rename the events
     for trial_type in trial_types:
         event_df.loc[event_df["trial_type"] == trial_type, "trial_type"] = [f"{trial_type}_{i}" for i in range(sum(event_df["trial_type"] == trial_type))]
+
+    event_df = event_df.loc[~event_df['trial_type'].str.contains('IMG')]
     
     return event_df
 
@@ -85,32 +93,57 @@ def fit_first_level_subject_per_trial(subject, bids_dir, mask, runs = [1, 2, 3, 
     # fit first level model for each run
     flms = []
 
+    # make a design matrix for each run
+    lsa_dms = []
+
     for i in range(len(runs)):
         print(f"Fitting model for run {i} for subject {subject}")
             
         # fit first level model
         first_level_model = FirstLevelModel(
-            t_r=int(nib.load(fprep_func_paths[0]).header['pixdim'][4]), 
+            t_r=int(nib.load(fprep_func_paths[i]).header['pixdim'][4]), 
             mask_img = mask, 
             slice_time_ref = 0.5,
             hrf_model = "glover",
+            smoothing_fwhm=1
             )
         
         # fit the model
         flm = first_level_model.fit(fprep_func_paths[i], events[i], confounds[i])
-        
+
+        # Load the NIfTI file
+        img = nib.load(fprep_func_paths[i])
+
+        # Get the number of volumes
+        num_volumes = img.shape[-1]
+
+        # Get the TR
+        TR = img.header['pixdim'][4]
+
+        # Get the time series data
+        ts = img.get_fdata()
+
+        frame_times = np.arange(0, num_volumes) * TR
+
+        # Let's make a standard LSA design matrix
+        lsa_dm = make_first_level_design_matrix(
+            frame_times=frame_times,  # we defined this earlier for interpolation!
+            events=events[i],
+            hrf_model='glover',
+            drift_model=None  # assume data is already high-pass filtered
+        )
+
+
+
+        lsa_dm = lsa_dm.iloc[:, :90]
+
+        lsa_dm = lsa_dm[events[i]['trial_type'].values]
+                
         flms.append(flm)
+
+        lsa_dms.append(lsa_dm)
     
-    return flms
-
-def get_contrast(regressor, flm, output_type = "z_score"):
-    """
-    Calculates the contrast of a given trial type
-    """
-    contrast_map  = flm.compute_contrast(regressor, output_type = output_type)
-
-    return contrast_map
-
+    return flms, lsa_dms, events
 
 if __name__ in "__main__":
     path  = Path(__file__).parents[1]
@@ -119,7 +152,6 @@ if __name__ in "__main__":
 
     bids_dir = Path("/work/816119/InSpePosNegData/BIDS_2023E")
     subjects = ["0116", "0117", "0118", "0119", "0120", "0121", "0122", "0123"]
-
     
     for subject in subjects:
         outpath_subject = outpath / f"sub-{subject}"
@@ -130,23 +162,40 @@ if __name__ in "__main__":
 
         mask = nib.load(f"/work/816119/InSpePosNegData/BIDS_2023E/derivatives/sub-{subject}/func/sub-{subject}_task-boldinnerspeech_run-1_space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz")
        
-        flms = fit_first_level_subject_per_trial(subject, bids_dir, mask = mask)
-
+        flms, lsa_dms, events = fit_first_level_subject_per_trial(subject, bids_dir, mask = mask)
 
         for i, flm in enumerate(flms):
-            # get the names of the regressors
-            regressor_names = flm.design_matrices_[0].columns
+            R_face = []
 
-            # only keep the ones with positive or negative
-            regressor_names = [name for name in regressor_names if "positive" in name or "negative" in name]
-
-            # get the contrasts
-            for reg in regressor_names:
-                contrast = flm.compute_contrast(reg, output_type = "effect_size")
-                
-                # save to pickle
-                file_name = f"contrast_{reg}_run_{i}.pkl"
-
-                pickle.dump(contrast, open(outpath_subject / file_name, 'wb'))
+            for col in events[i]['trial_type']:
+                contrast = flm.compute_contrast(col, output_type = "effect_size")
+                R_face.append(apply_mask(contrast, mask))
             
+            R_face = np.vstack(R_face)
+
+            # Do temporal uncorrelation
+            X = lsa_dms[i].to_numpy()
+            R_unc = sqrtm(X.T @ X) @ R_face
+
+            # #There seems to be some outliers in the data that we need to filter out.
+            R_unc[R_unc>5]=5
+            R_unc[R_unc<-5]=-5
+
+            # Unmask the 4D data
+            contrasts_run = unmask(R_unc, mask)
+
+            # Assuming you have a list named 'trial_types' with trial descriptions
+            positive_indices = [i for i, trial_type in enumerate(events[i]['trial_type']) if 'positive' in trial_type]
+            negative_indices = [i for i, trial_type in enumerate(events[i]['trial_type']) if 'negative' in trial_type]
+
+            positive_contrasts_img = index_img(contrasts_run, positive_indices)
+            negative_contrasts_img = index_img(contrasts_run, negative_indices)
+
+            # save the conditions to a pickle
+            file_name_pos = f"pos_contrasts_run_{i}.pkl"
+            file_name_neg = f"neg_contrasts_run_{i}.pkl"
+
+            pickle.dump(positive_contrasts_img, open(outpath_subject / file_name_pos, 'wb'))
+            pickle.dump(negative_contrasts_img, open(outpath_subject / file_name_neg, 'wb'))
     
+    print(f"{subject} done")
