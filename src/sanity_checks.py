@@ -18,7 +18,7 @@ if __name__ in "__main__":
 
     if not output_path.exists():
         output_path.mkdir(parents = True)
-    """
+
     # plot button press contrast for all subjects
     plot_contrast_all_subjects(
         flms, subject_ids, 
@@ -27,11 +27,10 @@ if __name__ in "__main__":
         contrast = "button_press", 
         output_type = "z_score"
         )
-    """
+
     subjects = ["0116", "0117", "0118", "0119", "0120", "0121", "0122", "0123"]
 
     bids_dir = Path("/work/816119/InSpePosNegData/BIDS_2023E")
-
 
     fig, axes = plt.subplots(4, 2, figsize = (10, 12))
 

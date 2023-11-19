@@ -101,14 +101,18 @@ def plot_contrast_subject_level(flm, subject_id, ax, threshold = False, contrast
     if threshold:
         contrast_map, threshold = threshold_stats_img(
             contrast_map, 
-            alpha=0.05, 
+            alpha=0.001, 
             height_control='bonferroni')
 
     plotting.plot_glass_brain(
         contrast_map,
         colorbar=True,
         plot_abs=False, 
+        annotate=False,
+        alpha = 0.2,
         cmap='RdBu',
+        vmin = -15,
+        vmax = 15,
         axes=ax)
     
     ax.set_title(f"Subject {subject_id}")

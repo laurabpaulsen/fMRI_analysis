@@ -138,7 +138,7 @@ def fit_first_level_subject_per_trial(subject, bids_dir, mask, runs = [1, 2, 3, 
         lsa_dm = lsa_dm.iloc[:, :90]
 
         lsa_dm = lsa_dm[events[i]['trial_type'].values]
-                
+
         flms.append(flm)
 
         lsa_dms.append(lsa_dm)
