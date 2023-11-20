@@ -34,15 +34,11 @@ def plot_searchlight_subject(searchlight_img, ax, threshold = False, title = Non
 
     """
 
-    if threshold: 
-        # calculate the chance level threshold using Bonferroni correction
-        searchlight_img = threshold_img(searchlight_img, threshold = threshold, cluster_threshold = 0.05, height_control = 'bonferroni')
-
     plot_glass_brain(
         searchlight_img,
         colorbar=True,
-        cmap='RdBu',
-        vmax = 1,
+        cmap='jet',
+        threshold = threshold,
         axes=ax,
         **kwargs)
     
