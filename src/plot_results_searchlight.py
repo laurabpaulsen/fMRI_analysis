@@ -1,15 +1,16 @@
 import pickle
 from pathlib import Path
 import matplotlib.pyplot as plt
-from nilearn.plotting import plot_glass_brain, plot_stat_map
+from nilearn.plotting import plot_glass_brain
 from nilearn.image import new_img_like
+from nilearn.image import threshold_img
 
 # local imports
 import sys
 sys.path.append(str(Path(__file__).parents[1]))
 from utils import chance_level
 
-def plot_searchlight_subject(searchlight_img, ax, threshold = False, title = None, plotting_function = plot_glass_brain, **kwargs):
+def plot_searchlight_subject(searchlight_img, ax, threshold = False, title = None, **kwargs):
     """
     Calculates and plots the contrast for the given first level model.
 
@@ -23,8 +24,6 @@ def plot_searchlight_subject(searchlight_img, ax, threshold = False, title = Non
         Axis to plot on. Defaults to None. If None, a new figure is created.
     title : str
         Title of the ax. Defaults to None.
-    plotting_function : function
-        The plotting function to use. Defaults to plot_glass_brain.
     **kwargs : dict
         Additional arguments to pass to the plotting function.
     
@@ -35,11 +34,14 @@ def plot_searchlight_subject(searchlight_img, ax, threshold = False, title = Non
 
     """
 
-    plotting_function(
+    if threshold: 
+        # calculate the chance level threshold using Bonferroni correction
+        searchlight_img = threshold_img(searchlight_img, threshold = threshold, cluster_threshold = 0.05, height_control = 'bonferroni')
+
+    plot_glass_brain(
         searchlight_img,
         colorbar=True,
         cmap='RdBu',
-        threshold = threshold,
         vmax = 1,
         axes=ax,
         **kwargs)
@@ -91,6 +93,7 @@ if __name__ in "__main__":
 
     chance = chance_level(n = 60*6, alpha = 0.001, p = 0.5)
 
+
     subjects = ["0116", "0117", "0118", "0119", "0120", "0121", "0122", "0123"]
     search_lights = []
 
@@ -103,26 +106,16 @@ if __name__ in "__main__":
 
         mask_wb_filename=f'/work/816119/InSpePosNegData/BIDS_2023E/derivatives/sub-{subject}/anat/sub-{subject}_acq-T1sequence_run-1_space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz'
         anat_filename=f'/work/816119/InSpePosNegData/BIDS_2023E/derivatives/sub-{subject}/anat/sub-{subject}_acq-T1sequence_run-1_space-MNI152NLin2009cAsym_desc-preproc_T1w.nii.gz'
+        n_voxels = searchlight.scores_.shape[0]
         
         #Create an image of the searchlight scores
         searchlight_img = new_img_like(anat_filename, searchlight.scores_)
 
         search_lights.append(searchlight_img)
-    
-    
+
     plot_searchlight_all_subjects(
         search_lights, subjects, 
         threshold = chance, 
         save_path = fig_path / "search_light_all_subjects_glass_brain.png", 
         plot_abs = False
-        )
-    
-    plot_searchlight_all_subjects(
-        search_lights, 
-        subjects, 
-        threshold = chance, 
-        save_path = fig_path / "search_light_all_subjects_stat_map.png", 
-        plotting_function = plot_stat_map, 
-        cut_coords=[-30,-20,-10,0,10,20,30],
-        display_mode='z'
         )
