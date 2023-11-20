@@ -40,6 +40,7 @@ def plot_searchlight_subject(searchlight_img, ax, threshold = False, title = Non
         cmap='jet',
         threshold = threshold,
         axes=ax,
+        vmin = threshold,
         **kwargs)
     
     if title:
@@ -87,7 +88,7 @@ if __name__ in "__main__":
     if not fig_path.exists():
         fig_path.mkdir(exist_ok = True)
 
-    chance = chance_level(n = 60*6, alpha = 0.001, p = 0.5)
+
 
 
     subjects = ["0116", "0117", "0118", "0119", "0120", "0121", "0122", "0123"]
@@ -102,16 +103,16 @@ if __name__ in "__main__":
 
         mask_wb_filename=f'/work/816119/InSpePosNegData/BIDS_2023E/derivatives/sub-{subject}/anat/sub-{subject}_acq-T1sequence_run-1_space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz'
         anat_filename=f'/work/816119/InSpePosNegData/BIDS_2023E/derivatives/sub-{subject}/anat/sub-{subject}_acq-T1sequence_run-1_space-MNI152NLin2009cAsym_desc-preproc_T1w.nii.gz'
-        n_voxels = searchlight.scores_.shape[0]
-        
+        n_voxels = searchlight.scores_.shape[0] * searchlight.scores_.shape[1] * searchlight.scores_.shape[2]
         #Create an image of the searchlight scores
         searchlight_img = new_img_like(anat_filename, searchlight.scores_)
 
         search_lights.append(searchlight_img)
 
+    chance = chance_level(n = 60*6, alpha = 0.05/n_voxels, p = 0.5)
     plot_searchlight_all_subjects(
         search_lights, subjects, 
         threshold = chance, 
         save_path = fig_path / "search_light_all_subjects_glass_brain.png", 
-        plot_abs = False
+        plot_abs = True
         )
