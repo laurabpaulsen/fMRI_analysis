@@ -46,7 +46,7 @@ def plot_searchlight_subject(searchlight_img, ax, threshold = False, title = Non
         ax.set_title(title)
 
 
-def plot_searchlight_all_subjects(search_light_imgs, subject_ids, threshold = None, save_path = None, plotting_function = plot_glass_brain, **kwargs):
+def plot_searchlight_all_subjects(search_light_imgs, subject_ids, threshold = None, save_path = None, **kwargs):
     """
     Plots a given contrast for all subjects in the given list of first level models.
 
@@ -69,7 +69,7 @@ def plot_searchlight_all_subjects(search_light_imgs, subject_ids, threshold = No
     
     for i, (searchlight_img, subject_id) in enumerate(zip(search_light_imgs, subject_ids)):
         ax = axes.flatten()[i]
-        plot_searchlight_subject(searchlight_img, ax, threshold = threshold, title = f"Subject {subject_id}", plotting_function = plotting_function, **kwargs)
+        plot_searchlight_subject(searchlight_img, ax, threshold = threshold, title = f"Subject {subject_id}", **kwargs)
 
     # add super title in bold
     fig.suptitle(f"Searchlight", fontweight="bold", fontsize=20)
