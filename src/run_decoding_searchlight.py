@@ -98,7 +98,7 @@ if __name__ in "__main__":
         X_sl, y_sl, X_cl, y_cl = prep_X_y(contrasts_pos, contrasts_neg)
 
         # brain mask 
-        mask_wb_filename = Path('/work/816119/InSpePosNegData/BIDS_2023E/derivatives/sub-0116/anat/sub-0116_acq-T1sequence_run-1_space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz')
+        mask_wb_filename = Path(f'/work/816119/InSpePosNegData/BIDS_2023E/derivatives/sub-{subject}/anat/sub-{subject}_acq-T1sequence_run-1_space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz')
         mask_img = load_img(mask_wb_filename)
 
         searchlight = SearchLight(
